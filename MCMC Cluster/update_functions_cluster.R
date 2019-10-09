@@ -204,6 +204,7 @@ update_stored_vars<-function()
   for(ii in 1:ncluster)
   {
     temp=rbind(current_values$w[current_values$K_w==ii,],current_values$z[current_values$K_z==ii,])
+    # temp=current_values$w[current_values$K_z==ii,]
     gms[ii]=dim(temp)[1]
     gmeans[ii,]=apply(temp,2,mean)
     gsd[ii]=sqrt(sum((temp-current_values$mu[ii,])^2)/2)

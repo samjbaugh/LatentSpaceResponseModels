@@ -1,4 +1,5 @@
 load_spelling_data<-function()
 {
-  return(list('data'=read.table('../Data/spelling.dat'),'dataname'='spelling'))
+  raw_data=read.table('../Data/spelling.dat')
+  return(list('data'=raw_data[,2:5],'dataname'='spellingGender','gender'=factor(raw_data[1,])))
 }

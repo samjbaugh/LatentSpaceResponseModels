@@ -1,5 +1,3 @@
-
-
 initialize_cluster_sampler<-function(config_number)
 {
   load(paste('Run_configs/config_',config_number,'.Rdat',sep=''))
