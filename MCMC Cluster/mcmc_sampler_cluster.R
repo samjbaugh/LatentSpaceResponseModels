@@ -5,6 +5,7 @@ require('ggforce')
 source('update_functions_cluster.R')
 source('likelihood_functions.R')
 source('init_clusters.R')
+source('data_funs.R')
 
 run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=100,load_data=load_spelling_data)
 {
