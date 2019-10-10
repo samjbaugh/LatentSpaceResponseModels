@@ -16,6 +16,13 @@ euc_dist_ordinal <- function(z,w)
   return(array(as.matrix(distout),dim=c(nz,nw,ntau)))
 }
 
+global_update<-function(name,axis,newvalue)
+{
+  myvariable=get(name)
+  myvariable[[axis]]=newvalue
+  assign(name,myvariable,envir=.GlobalEnv)
+}
+
 
 plot_latent <- function(stored_parameters,kk,title="")
 {
@@ -28,7 +35,7 @@ plot_latent <- function(stored_parameters,kk,title="")
   print(p0)
 }
 
-plot_latent_ordinal_cluster <- function(stored_parameters,kk,save_tf=F,save_filename="")
+plot_latent_ordinal_cluster <- function(stored_parameters,kk,save_tf=F,mytitle="",save_filename="")
 {
   z=data.frame(stored_parameters$z[[kk]]) #data.frame(matrix(stored_parameters$z[M,],nz,2))
   w=data.frame(matrix(stored_parameters$w[[kk]],nw*ntau,2)) #data.frame(matrix(stored_parameters$w[M,],nw,2))
@@ -37,11 +44,10 @@ plot_latent_ordinal_cluster <- function(stored_parameters,kk,save_tf=F,save_file
   
   temp_z=sapply(stored_parameters$K_z[[kk]],function(x) paste(toString(x)))
   z$K=as.factor(temp_z)
-  z$wz="z"
   
   temp_w=sapply(stored_parameters$K_w[[kk]],function(x) paste(toString(x)))
   w$K=as.factor(temp_w)
-  w$wz=c(rep("w k=1",nw),rep("w k=2",nw),rep("w k=3",nw),rep("w k=4",nw))
+  w$wname=c(rep("w k=1",nw),rep("w k=2",nw),rep("w k=3",nw),rep("w k=4",nw))
   
   mu=data.frame(stored_parameters$mu[[kk]])
   colnames(mu)<-c('coord1','coord2')
@@ -49,10 +55,11 @@ plot_latent_ordinal_cluster <- function(stored_parameters,kk,save_tf=F,save_file
   mu$K=sapply(1:ncluster,function(x) paste(toString(x)))
   mu$r=stored_parameters$sigma[[kk]]
   
-  toplot=rbind(z,w)
-  p0<-ggplot()+geom_point(aes(x=coord1,y=coord2,col=K,pch=wz),toplot,cex=2)
-  p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')+ggtitle(paste('Latent space sample at M=',kk,sep=''))
-  p0<-p0+geom_point(aes(x=coord1,y=coord2,col=K,pch=wz),data=mu)
+  p0<-ggplot()
+  p0<-p0+geom_point(aes(x=coord1,y=coord2,col=K,pch='z'),data=z,cex=2)
+  p0<-p0+geom_point(aes(x=coord1,y=coord2,col=K,pch=wname),data=w,cex=2)
+  p0<-p0+geom_point(aes(x=coord1,y=coord2,col=K,pch='mu'),data=mu)
+  p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')+ggtitle(paste('Latent space sample at M=',mytitle,sep=''))
   p0<-p0+geom_circle(aes(x0=coord1,y0=coord2,col=K,r=r),data=mu)
   p0<-p0+scale_shape_manual(values=c("z"=16,"w k=1"=8,"w k=2"=9,"w k=3"=10,"w k=4"=11,"mu"=4))
   # p1=p0+geom_point(aes(x=current_values[['mu_z']][,1],y=current_values[['mu_z']][,2],col=c("1_z","2_z","3_z","4_z","5_z"),pch="cluster mu z"),cex=4)
@@ -71,10 +78,9 @@ plot_latent_ordinal_cluster <- function(stored_parameters,kk,save_tf=F,save_file
 update_vector<-function(varname)
 {
   current_vector=current_values[[varname]]
-  ns=dim(current_vector) #stored_values[[paste('n',varname,sep='')]]
-  n1=ns[1]
-  n2=ns[2]
-  proposal_sig=global_vars[[paste('proposal_sig',varname,sep='_')]]
+  n1=dim(current_vector)[1]
+  n2=dim(current_vector)[2]
+  proposal_sig=proposal_sigs[[varname]]
   proposed_vector=matrix(rnorm(n=n1*n2,mean=current_vector,sd=proposal_sig),n1,n2)
   if(varname=='tau'){proposed_vector[,1]=0}
   
@@ -91,28 +97,6 @@ update_vector<-function(varname)
   retval=matrix(ifelse(rep(accepts,n2),proposed_vector,current_vector),n1,n2)
   
   return(list("newvalue"=retval,"alpha"=alpha,"accepts"=accepts)) 
-}
-
-update_sigma <- function(varname)
-{
-  current_vector<-current_values[[varname]]
-  n=length(current_vector)
-  
-  newsigma=sqrt(rinvgamma(1,shape=hyperparameters$invgam_shape_all+n/2,rate=hyperparameters$invgam_rate_all+sum(current_vector^2)/2))
-  
-  return(newsigma)
-}
-
-
-update_sigma_clusters <- function()
-{
-  gsd=stored_vars$gsd
-  m=stored_vars$gm
-  
-  latent=1
-  newsigmas=sqrt(rinvgamma(n=ncluster,shape=hyperparameters$invgam_shape_all+m*(latent+1)/2,rate=hyperparameters$invgam_rate_all+gsd^2/2))
-  
-  return(newsigmas)
 }
 
 update_K <- function(varname="")
@@ -141,7 +125,6 @@ update_K <- function(varname="")
   return(list("K_z"=K_z,"K_w"=K_w))
 }
 
-
 update_mu_clusters <- function()
 {
   sigs=current_values$sigma
@@ -150,6 +133,28 @@ update_mu_clusters <- function()
   
   return(cbind(rnorm(ncluster,mean=gms*gmeans[,1]/(gms+sigs^2/current_values$omega^2),sd=sqrt(sigs^2/(gms+sigs^2/current_values$omega^2))),
                rnorm(ncluster,mean=gms*gmeans[,2]/(gms+sigs^2/current_values$omega^2),sd=sqrt(sigs^2/(gms+sigs^2/current_values$omega^2))))) ###take square root of sigmasqured term?
+}
+
+update_sigma <- function(varname)
+{
+  current_vector<-current_values[[varname]]
+  n=length(current_vector)
+  
+  newsigma=sqrt(rinvgamma(1,shape=hyperparameters$invgam_shape_all+n/2,rate=hyperparameters$invgam_rate_all+sum(current_vector^2)/2))
+  
+  return(newsigma)
+}
+
+
+update_sigma_clusters <- function()
+{
+  gsd=stored_vars$gsd
+  m=stored_vars$gm
+  
+  latent=1
+  newsigmas=sqrt(rinvgamma(n=ncluster,shape=hyperparameters$invgam_shape_all+m*(latent+1)/2,rate=hyperparameters$invgam_rate_all+gsd^2/2))
+  
+  return(newsigmas)
 }
 
 update_lambda <- function()
@@ -179,13 +184,6 @@ update_stored_vars<-function()
     gsd[ii]=sqrt(sum((temp-current_values$mu[ii,])^2)/2)
   }
   return(list('gm'=gms,'gmeans'=gmeans,'gsd'=gsd))
-}
-
-load_charity_data<-function()
-{
-  rawdata=read.table('../Data/charity.dat')
-  X=rawdata[!apply(is.na(rawdata),1,any),]
-  return(list('data'=X,'dataname'='charity'))
 }
 
 rdirichlet<-function (n, alpha) 

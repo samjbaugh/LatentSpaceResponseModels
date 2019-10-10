@@ -12,12 +12,14 @@ stored_vars_init[['ncluster']]=ncluster
 sigma_theta_config=2
 sigma_mu_config=2
 sigma_beta_config=1
+sigma_tau_config=1
 cluster_sigma_config=1
 config_number=1
 
 if(!file.exists('Run_configs')) {dir.create(file.path('Run_configs'))}
 config_filename=paste('Run_configs/config',config_number,'.Rdat',sep='')
-if(!file.exists(config_filename))
+overwrite=T
+if(!file.exists(config_filename) | overwrite)
 {
   save(nu_config,rate_all_config,shape_all_config,
        omega_config,sigma_theta_config,sigma_mu_config,

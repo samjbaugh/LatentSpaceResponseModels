@@ -8,6 +8,13 @@ euc_dist <- function(z,w)
   return(as.matrix(pdist(z,w)))
 }
 
+global_update<-function(name,axis,newvalue)
+{
+  myvariable=get(name)
+  myvariable[[axis]]=newvalue
+  assign(name,myvariable,envir=.GlobalEnv)
+}
+
 plot_latent <- function(stored_parameters,kk,title="")
 {
   z=data.frame(stored_parameters$z[[kk]])
@@ -28,13 +35,13 @@ plot_latent_cluster <- function(stored_parameters,kk,mytitle="",plot_pie=FALSE,b
   names(w)<-c('coord1','coord2')
   
   z$K=gender
-
+  
   mu=data.frame(stored_parameters$mu[[kk]])
   colnames(mu)<-c('coord1','coord2')
   w$name=sapply(1:nw,function(x) toString(x))
   mu$K=c('female','male')
   mu$r=stored_parameters$sigma[[kk]]
-
+  
   p0<-ggplot()+geom_point(aes(x=coord1,y=coord2,col=K),data=z,cex=2)
   p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')+ggtitle(paste('Latent space sample at k=',mytitle,sep=''))
   p0<-p0+geom_point(aes(x=coord1,y=coord2),pch=8,col='black',data=mu)
@@ -61,10 +68,9 @@ save_plot<-function(myp,name="myname"){
 update_vector<-function(varname)
 {
   current_vector=current_values[[varname]]
-  ns=dim(current_vector) #stored_values[[paste('n',varname,sep='')]]
-  n1=ns[1]
-  n2=ns[2]
-  proposal_sig=global_vars[[paste('proposal_sig',varname,sep='_')]]
+  n1=dim(current_vector)[1]
+  n2=dim(current_vector)[2]
+  proposal_sig=proposal_sigs[[varname]]
   proposed_vector=matrix(rnorm(n=n1*n2,mean=current_vector,sd=proposal_sig),n1,n2)
   
   likelihood_fun<-function(x) {likelihood_funs[[varname]](x)}

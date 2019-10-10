@@ -1,11 +1,9 @@
 initialize_cluster_sampler<-function(config_number)
 {
-  load(paste('Run_configs/config_',config_number,'.Rdat',sep=''))
+  if(!file.exists('Saved_output')) {dir.create('Saved_output')}
+  if(!file.exists('Images')) {dir.create('Images')}
   
-  stored_vars_init=list()
-  stored_vars_init$n_z=nz
-  stored_vars_init$n_w=nw
-  stored_vars_init$ncluster=ncluster
+  load(paste('Run_configs/config_',config_number,'.Rdat',sep=''))
   
   #hyperparameters
   hyperparameters=list()
@@ -22,9 +20,7 @@ initialize_cluster_sampler<-function(config_number)
   #initialize z:
   lambda_init=rdirichlet(1,rep(hyperparameters$nu,ncluster))
   
-  # K_z_init=factor(ideology,levels=c("Liberal","Conservative","Moderate"),labels=c(1,2,3))
   K_z_init=sample(1:ncluster,nz,rep=T,prob=lambda_init)
-  # K_w_init=factor(c(1,1,1,3,3,2,2))
   K_w_init=c(1,1,2,2)[sample(4)] #sample(1:ncluster,nw,rep=T,prob=lambda_init)
   
   mu_init=matrix(rnorm(2*ncluster,sd=sigma_mu_config),ncluster,2)
@@ -57,6 +53,8 @@ initialize_cluster_sampler<-function(config_number)
     gmeans[ii,]=apply(temp,2,mean)
     gsd[ii]=sqrt(sum((temp-gmeans[ii,])^2)/2)
   }
+  
+  stored_vars_init=list()
   stored_vars_init$gm=gms
   stored_vars_init$gmeans=gmeans
   stored_vars_init$gsd=gsd
@@ -77,7 +75,14 @@ initialize_cluster_sampler<-function(config_number)
                    "K_z"=K_z_init,
                    "K_w"=K_w_init,
                    "omega"=omega_init)
-  return(list('init_values'=init_values,'stored_vars'=stored_vars_init,'hyperparameters'=hyperparameters))
+  
+  proposal_sigs=list()
+  for(varname in varname_list)
+  {
+    proposal_sigs[[varname]]=2
+  }
+  
+  return(list('init_values'=init_values,'stored_vars'=stored_vars_init,'hyperparameters'=hyperparameters,'proposal_sigs'=proposal_sigs))
 }
 
 

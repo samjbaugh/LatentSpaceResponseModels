@@ -66,7 +66,7 @@ likelihood_funs$beta=likelihood_beta
 
 likelihood_tau<-function(given_tau)
 {
-  tau_mat=aperm(array(rep(current_values$tau,nz),dim=c(nw,ntau,nz)),perm=c(3,1,2))
+  tau_mat=aperm(array(rep(given_tau,nz),dim=c(nw,ntau,nz)),perm=c(3,1,2))
   
   wz_dist=euc_dist_ordinal(current_values$z,current_values$w)
   bt_mat=array(rep(outer(c(current_values$theta),c(current_values$beta),'+'),ntau),dim=c(nz,nw,ntau))
@@ -74,7 +74,7 @@ likelihood_tau<-function(given_tau)
   term_mat_unnorm=sigmoid(tau_mat+bt_mat-wz_dist)
   term_mat_norm=aperm(apply(term_mat_unnorm,c(1,2),function(r) r/sum(r)),c(2,3,1)) #normalize
   
-  retval=sapply(1:ntau,function(k) {r=term_mat_norm[,,k]
+  retval=sapply(1:ntau,function(k) {r=term_mat_norm[,,k];
                 r*(X==k)+(1-(X==k))*(1-r)},simplify="array")
   
   return(apply(log(retval),c(2,3),sum))

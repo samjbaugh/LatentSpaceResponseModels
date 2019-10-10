@@ -63,7 +63,7 @@ initialize_ordinal_cluster_sampler<-function(config_number)
   sigma_beta=sigma_beta_config
   beta_init=matrix(rnorm(nw,0,sigma_beta),nw,1)
   
-  sigma_tau_init=1
+  sigma_tau_init=sigma_tau_config
   tau_init=matrix(rnorm(nw*ntau,0,sigma_tau_init),nw,ntau)
   tau_init[,1]=0
   
@@ -82,7 +82,15 @@ initialize_ordinal_cluster_sampler<-function(config_number)
                    "K_z"=K_z_init,
                    "K_w"=K_w_init,
                    "omega"=omega_init,
-                   "tau"=tau_init)
-  return(list('init_values'=init_values,'stored_vars'=stored_vars_init,'hyperparameters'=hyperparameters))
+                   "tau"=tau_init,
+                   "sigma_tau"=sigma_tau_init)
+  
+  proposal_sigs=list()
+  for(varname in varname_list)
+  {
+    proposal_sigs[[varname]]=2
+  }
+  
+  return(list('init_values'=init_values,'stored_vars'=stored_vars_init,'hyperparameters'=hyperparameters,'proposal_sigs'=proposal_sigs))
 }
 
