@@ -150,7 +150,7 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data=load_
 
 M=10000
 myseed=1111
-config_number=1
+config_number=2
 plot_iter=100
 # load_data=load_spelling_data
 # ordinal=F
