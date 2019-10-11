@@ -68,8 +68,15 @@ initialize_sampler<-function(config_number,ordinal=F)
   stored_vars_init$gsd=gsd
   
   #init beta
-  sigma_beta=sigma_beta_config
-  beta_init=matrix(rnorm(nw,0,sigma_beta),nw,1)
+  if(ordinal)
+  {
+    sigma_beta=0
+    beta_init=matrix(0,nw,1)
+  }else{
+    sigma_beta=sigma_beta_config
+    beta_init=matrix(rnorm(nw,0,sigma_beta),nw,1)
+  }
+
   
   init_values=list("z"=z_init,
                    "w"=w_init,
@@ -96,8 +103,8 @@ initialize_sampler<-function(config_number,ordinal=F)
     init_values$tau=tau_init
     init_values$sigma_tau=sigma_tau_init
     
-    assign("varname_list",c("z","w","theta","beta","tau"),envir=.GlobalEnv)
-    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=TRUE,"beta"=FALSE,"tau"=TRUE),envir=.GlobalEnv)
+    assign("varname_list",c("z","w","theta","tau"),envir=.GlobalEnv)
+    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=TRUE,"tau"=TRUE),envir=.GlobalEnv)
   }else{
     assign("varname_list",c("z","w","theta","beta"),envir=.GlobalEnv)
     assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=TRUE,"beta"=FALSE),envir=.GlobalEnv)

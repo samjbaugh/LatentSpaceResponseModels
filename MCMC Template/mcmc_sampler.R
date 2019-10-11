@@ -31,7 +31,7 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
   if(!file.exists(plot_dirname)) {dir.create(plot_dirname)}
   save_filename=file.path(paste('Saved_output/saved_output_config_',config_number,'_seed_',myseed,'_data_',dataname,sep=''))
   
-  overwrite=T
+  overwrite=F
   if(file.exists(save_filename) & !overwrite)
   {
     load(save_filename,verb=T)
@@ -107,6 +107,7 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
         global_update("current_values",sig_varname,newsigma)
       }
     }
+
     assign("stored_vars",update_stored_vars(),envir = .GlobalEnv)
     
     newK=update_K()
@@ -152,7 +153,7 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
 
 M=10000
 myseed=1111
-config_number=1
+config_number=2
 plot_iter=100
 # load_data=load_spelling_data
 # ordinal=F
@@ -163,6 +164,6 @@ load_data=load_big5_data
 ordinal=T
 run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_data,ordinal=T)
 
-save_filename=file.path(paste('Saved_output/saved_output_config_',config_number,'_seed_',myseed,'_data_',dataname,sep=''))
-load(save_filename,verb=T)
+# save_filename=file.path(paste('Saved_output/saved_output_config_',config_number,'_seed_',myseed,'_data_',dataname,sep=''))
+# load(save_filename,verb=T)
 # print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))
