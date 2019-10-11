@@ -131,7 +131,7 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data=load_
     for(varname in varname_list)
     {
       #rosenthall and roberts algorithm
-      delta=ifelse(mean(acceptance_rates[[varname]][1:jj],na.rm=T)>.44,min(.01,1/sqrt(jj)),-min(.01,1/sqrt(jj)))
+      delta=ifelse(mean(acceptance_rates[[varname]][batch_size:jj],na.rm=T)>.44,min(.01,1/sqrt(jj)),-min(.01,1/sqrt(jj)))
       proposal_sigs[[varname]]=proposal_sigs[[varname]]*exp(delta)
     }
     assign("proposal_sigs",proposal_sigs,envir = .GlobalEnv)
@@ -150,7 +150,7 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data=load_
 M=10000
 myseed=1111
 config_number=1
-plot_iter=10
+plot_iter=100
 # load_data=load_spelling_data
 # ordinal=F
 #non-ordinal cluster:
