@@ -97,7 +97,7 @@ plot_latent_cluster <- function(stored_parameters,store_index,mytitle="",save_fi
 plot_latent_ordinal_cluster <- function(stored_parameters,store_index,mytitle="",save_fig=F,plot_pie=F,save_filename="")
 {
   z=data.frame(stored_parameters$z[[store_index]]) #data.frame(matrix(stored_parameters$z[M,],nz,2))
-  w=data.frame(matrix(stored_parameters$w[[store_index]],nw*ntau,2)) #data.frame(matrix(stored_parameters$w[M,],nw,2))
+  w=data.frame(stored_parameters$w[[store_index]]) #data.frame(matrix(stored_parameters$w[M,],nw,2))
   names(z)<-c('coord1','coord2')
   names(w)<-c('coord1','coord2')
   

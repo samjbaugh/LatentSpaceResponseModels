@@ -21,7 +21,12 @@ initialize_sampler<-function(config_number,ordinal=F)
   lambda_init=rdirichlet(1,rep(hyperparameters$nu,ncluster))
   
   K_z_init=sample(1:ncluster,nz,rep=T,prob=lambda_init)
-  K_w_init=sample(1:ncluster,nw,rep=T,prob=lambda_init)
+  if(ordinal)
+  {
+    K_w_init=sample(1:ncluster,nw*ntau,rep=T,prob=lambda_init)
+  }else{
+    K_w_init=sample(1:ncluster,nw,rep=T,prob=lambda_init)
+  }
   
   mu_init=matrix(rnorm(2*ncluster,sd=sigma_mu_config),ncluster,2)
   sigma_init=rep(cluster_sigma_config,ncluster) #sqrt(rinvgamma(ncluster,shape=invgam_shape_latent,rate=invgam_rate_latent))   
@@ -29,7 +34,10 @@ initialize_sampler<-function(config_number,ordinal=F)
   z_init=matrix(NA,nz,2)
   colnames(z_init)<-c('coord1','coord2')
   
-  w_init=matrix(NA,nw,2)
+  if(ordinal)
+  {
+    w_init=matrix(NA,nw*ntau,2)
+  }
   colnames(w_init)<-c('coord1','coord2')
   
   gms=rep(NA,ncluster)
