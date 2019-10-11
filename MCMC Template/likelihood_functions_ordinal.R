@@ -1,5 +1,7 @@
 likelihood_funs=list()
 
+assign('mytol',1e-320,envir = .GlobalEnv)
+
 likelihood_z<-function(given_z)
 {
   tau_mat=aperm(array(rep(current_values$tau,nz),dim=c(nw,ntau,nz)),perm=c(3,1,2))
@@ -8,11 +10,12 @@ likelihood_z<-function(given_z)
   bt_mat=array(rep(outer(c(current_values$theta),c(current_values$beta),'+'),ntau),dim=c(nz,nw,ntau))
   
   term_mat_unnorm=sigmoid(tau_mat+bt_mat-wz_dist)
+  term_mat_unnorm[term_mat_unnorm==0]=mytol
   term_mat_norm=aperm(apply(term_mat_unnorm,c(1,2),function(r) r/sum(r)),c(2,3,1)) #normalize
   
   retval=sapply(1:nw,function(jj) 
-    sapply(1:nz,function(ii) term_mat_norm[ii,jj,][X[ii,jj]-minord+1]))
-  retval[retval==0]=1e-100
+    sapply(1:nz,function(ii) term_mat_norm[ii,jj,X[ii,jj]-minord+1]))
+  retval[retval==0]=mytol
   return(rowSums(log(retval)))
 }
 likelihood_funs$z=likelihood_z
@@ -25,11 +28,12 @@ likelihood_w<-function(given_w)
   bt_mat=array(rep(outer(c(current_values$theta),c(current_values$beta),'+'),ntau),dim=c(nz,nw,ntau))
   
   term_mat_unnorm=sigmoid(tau_mat+bt_mat-wz_dist)
+  term_mat_unnorm[term_mat_unnorm==0]=mytol
   term_mat_norm=aperm(apply(term_mat_unnorm,c(1,2),function(r) r/sum(r)),c(2,3,1)) #normalize
   
   retval=sapply(1:nw,function(jj) 
     sapply(1:nz,function(ii) term_mat_norm[ii,jj,][X[ii,jj]-minord+1]))
-  retval[retval==0]=1e-100
+  retval[retval==0]=mytol
   return(colSums(log(retval)))
 }
 likelihood_funs$w=likelihood_w
@@ -42,11 +46,12 @@ likelihood_theta<-function(given_theta)
   bt_mat=array(rep(outer(c(given_theta),c(current_values$beta),'+'),ntau),dim=c(nz,nw,ntau))
   
   term_mat_unnorm=sigmoid(tau_mat+bt_mat-wz_dist)
+  term_mat_unnorm[term_mat_unnorm==0]=mytol
   term_mat_norm=aperm(apply(term_mat_unnorm,c(1,2),function(r) r/sum(r)),c(2,3,1)) #normalize
   
   retval=sapply(1:nw,function(jj) 
     sapply(1:nz,function(ii) term_mat_norm[ii,jj,][X[ii,jj]-minord+1]))
-  retval[retval==0]=1e-100
+  retval[retval==0]=mytol
   return(rowSums(log(retval)))
 }
 likelihood_funs$theta=likelihood_theta
@@ -59,11 +64,12 @@ likelihood_beta<-function(given_beta)
   bt_mat=array(rep(outer(c(current_values$theta),c(given_beta),'+'),ntau),dim=c(nz,nw,ntau))
   
   term_mat_unnorm=sigmoid(tau_mat+bt_mat-wz_dist)
+  term_mat_unnorm[term_mat_unnorm==0]=mytol
   term_mat_norm=aperm(apply(term_mat_unnorm,c(1,2),function(r) r/sum(r)),c(2,3,1)) #normalize
   
   retval=sapply(1:nw,function(jj) 
     sapply(1:nz,function(ii) term_mat_norm[ii,jj,][X[ii,jj]-minord+1]))
-  retval[retval==0]=1e-100
+  retval[retval==0]=mytol
   return(colSums(log(retval)))
 }
 likelihood_funs$beta=likelihood_beta
@@ -76,11 +82,12 @@ likelihood_tau<-function(given_tau)
   bt_mat=array(rep(outer(c(current_values$theta),c(current_values$beta),'+'),ntau),dim=c(nz,nw,ntau))
   
   term_mat_unnorm=sigmoid(tau_mat+bt_mat-wz_dist)
+  term_mat_unnorm[term_mat_unnorm==0]=mytol
   term_mat_norm=aperm(apply(term_mat_unnorm,c(1,2),function(r) r/sum(r)),c(2,3,1)) #normalize
   
   retval=sapply(1:ntau,function(k) {r=term_mat_norm[,,k];
                 r*(X==k)+(1-(X==k))*(1-r)},simplify="array")
-  retval[retval==0]=1e-100
+  retval[retval==0]=mytol
   return(apply(log(retval),c(2,3),sum))
   ##end likelihood section
 }
@@ -92,9 +99,10 @@ calculate_full_likelihood<-function(stored_parameters,kk)
   tau_mat=aperm(array(rep(stored_parameters$tau[[kk]],nz),dim=c(nw,ntau,nz)),perm=c(3,1,2))
   
   wz_dist=euc_dist_ordinal(stored_parameters$z[[kk]],stored_parameters$w[[kk]])
-  bt_mat=array(rep(outer(c(stored_parameters$theta[[kk]]),c(stored_parameters$beta[[kk]]),'+'),ntau),dim=c(nz,nw,ntau))
+  bt_mat=array(rep(outer(c(stored_parameters$theta[[kk]]),c(stored_parameters$beta[[min(kk,length(stored_parameters$beta))]]),'+'),ntau),dim=c(nz,nw,ntau))
   
   term_mat_unnorm=sigmoid(tau_mat+bt_mat-wz_dist)
+  term_mat_unnorm[term_mat_unnorm==0]=1e-320
   term_mat_norm=aperm(apply(term_mat_unnorm,c(1,2),function(r) r/sum(r)),c(2,3,1)) #normalize
   
   retval=sapply(1:nw,function(jj) 

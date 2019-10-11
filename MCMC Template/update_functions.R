@@ -10,8 +10,7 @@ euc_dist <- function(z,w)
 
 euc_dist_ordinal <- function(z,w)
 {
-  w_flattened=matrix(w,nw*ntau,2)
-  distout=pdist(z,w_flattened)
+  distout=pdist(z,w)
   return(array(as.matrix(distout),dim=c(nz,nw,ntau)))
 }
 
@@ -140,7 +139,6 @@ update_vector<-function(varname)
   n2=dim(current_vector)[2]
   proposal_sig=proposal_sigs[[varname]]
   proposed_vector=matrix(rnorm(n=n1*n2,mean=current_vector,sd=proposal_sig),n1,n2)
-  if(varname=='tau'){proposed_vector[,1]=0}
   
   likelihood_fun<-function(x) {likelihood_funs[[varname]](x)}
   prior_fun<-function(x) {prior_funs[[varname]](x)}
@@ -153,7 +151,11 @@ update_vector<-function(varname)
   accepts=randnum<alpha
   
   retval=matrix(ifelse(rep(accepts,n2),proposed_vector,current_vector),n1,n2)
-  
+  if(any(is.na(retval)))
+  {
+    save(list=ls(),file='temp_save_delete.Rdat')
+    error(e)
+  }  
   return(list("newvalue"=retval,"alpha"=alpha,"accepts"=accepts)) 
 }
 
