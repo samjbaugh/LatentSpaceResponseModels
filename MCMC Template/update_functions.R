@@ -153,7 +153,11 @@ update_vector<-function(varname)
   accepts=randnum<alpha
   
   retval=matrix(ifelse(rep(accepts,n2),proposed_vector,current_vector),n1,n2)
-  
+  if(any(is.na(retval)))
+  {
+    save(list=ls(),file='temp_save_delete.Rdat')
+    error(e)
+  }  
   return(list("newvalue"=retval,"alpha"=alpha,"accepts"=accepts)) 
 }
 
