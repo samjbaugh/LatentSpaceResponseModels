@@ -12,6 +12,7 @@ likelihood_z<-function(given_z)
   
   retval=sapply(1:nw,function(jj) 
     sapply(1:nz,function(ii) term_mat_norm[ii,jj,][X[ii,jj]-minord+1]))
+  retval[retval==0]=1e-100
   return(rowSums(log(retval)))
 }
 likelihood_funs$z=likelihood_z
@@ -28,6 +29,7 @@ likelihood_w<-function(given_w)
   
   retval=sapply(1:nw,function(jj) 
     sapply(1:nz,function(ii) term_mat_norm[ii,jj,][X[ii,jj]-minord+1]))
+  retval[retval==0]=1e-100
   return(colSums(log(retval)))
 }
 likelihood_funs$w=likelihood_w
@@ -44,6 +46,7 @@ likelihood_theta<-function(given_theta)
   
   retval=sapply(1:nw,function(jj) 
     sapply(1:nz,function(ii) term_mat_norm[ii,jj,][X[ii,jj]-minord+1]))
+  retval[retval==0]=1e-100
   return(rowSums(log(retval)))
 }
 likelihood_funs$theta=likelihood_theta
@@ -60,6 +63,7 @@ likelihood_beta<-function(given_beta)
   
   retval=sapply(1:nw,function(jj) 
     sapply(1:nz,function(ii) term_mat_norm[ii,jj,][X[ii,jj]-minord+1]))
+  retval[retval==0]=1e-100
   return(colSums(log(retval)))
 }
 likelihood_funs$beta=likelihood_beta
@@ -76,7 +80,7 @@ likelihood_tau<-function(given_tau)
   
   retval=sapply(1:ntau,function(k) {r=term_mat_norm[,,k];
                 r*(X==k)+(1-(X==k))*(1-r)},simplify="array")
-  
+  retval[retval==0]=1e-100
   return(apply(log(retval),c(2,3),sum))
   ##end likelihood section
 }

@@ -8,7 +8,7 @@ sigma_beta_config=1
 cluster_sigma_config=1
 config_number=1
 sigma_tau_config=1 #only needed for ordinal
-config_filename=paste('Run_configs/config',config_number,'.Rdat',sep='')
+config_filename=paste('Run_configs/config_',config_number,'.Rdat',sep='')
 overwrite=T
 if(!file.exists(config_filename) | overwrite)
 {
