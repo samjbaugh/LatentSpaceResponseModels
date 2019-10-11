@@ -1,3 +1,4 @@
+library(tidyverse)
 require('invgamma')
 require('ggplot2')
 require('pdist')
