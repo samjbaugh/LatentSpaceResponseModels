@@ -1,3 +1,5 @@
+setwd("C:/Users/erich/Desktop/LatentSpaceResponseModels/MCMC Template")
+
 library(tidyverse)
 require('invgamma')
 require('ggplot2')
@@ -7,7 +9,7 @@ source('update_functions.R')
 source('init_sampler.R')
 source('data_funs.R')
 
-run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data=load_spelling_data,ordinal=F)
+run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordinal)
 {
   if(ordinal){
     source('likelihood_functions_ordinal.R')
@@ -142,7 +144,7 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data=load_
       print('acceptance rates:')
       print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))
       print(data.frame(proposal_sigs))
-      save(stored_parameters,current_values,stored_likelihoods,stored_vars,hyperparameters,proposal_sigs,acceptance_rates,current_seed,varname_list,update_sigma_tf,file=save_filename)   
+      save(stored_parameters,current_values,stored_likelihoods,stored_vars,hyperparameters,proposal_sigs,acceptance_rates,current_seed,varname_list,update_sigma_tf,X,file=save_filename)   
       plot_fun(stored_parameters,storej,mytitle=toString(jj),save_fig=T,save_filename=paste(plot_dirname,'/iteration_',jj,'.png',sep=''))
     }
   }
@@ -157,7 +159,7 @@ plot_iter=100
 #non-ordinal cluster:
 # run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_spelling_data)
 #ordinal cluster:
-load_data=load_charity_data
+load_data=load_big5_data
 ordinal=T
 run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_data,ordinal=T)
 
