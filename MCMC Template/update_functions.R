@@ -105,7 +105,7 @@ plot_latent_ordinal_cluster <- function(stored_parameters,store_index,mytitle=""
   
   temp_w=sapply(stored_parameters$K_w[[store_index]],function(x) paste(toString(x)))
   w$K=as.factor(temp_w)
-  w$wname=c(rep("w k=1",nw),rep("w k=2",nw),rep("w k=3",nw),rep("w k=4",nw))
+  w$wname=c(rep("w k=1",nw),rep("w k=2",nw),rep("w k=3",nw),rep("w k=4",nw),rep("w k=5",nw))
   
   mu=data.frame(stored_parameters$mu[[store_index]])
   colnames(mu)<-c('coord1','coord2')
@@ -119,7 +119,8 @@ plot_latent_ordinal_cluster <- function(stored_parameters,store_index,mytitle=""
   p0<-p0+geom_point(aes(x=coord1,y=coord2,col=K,pch='mu'),data=mu)
   p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')+ggtitle(paste('Latent space sample at M=',mytitle,sep=''))
   p0<-p0+geom_circle(aes(x0=coord1,y0=coord2,col=K,r=r),data=mu)
-  p0<-p0+scale_shape_manual(values=c("z"=16,"w k=1"=8,"w k=2"=9,"w k=3"=10,"w k=4"=11,"mu"=4))
+  p0<-p0+scale_shape_manual(values=c("z"=16,"w k=1"=8,"w k=2"=9,"w k=3"=10,"w k=4"=11,
+                                     "w k=5" = 12, "mu"=4))
   # p1=p0+geom_point(aes(x=current_values[['mu_z']][,1],y=current_values[['mu_z']][,2],col=c("1_z","2_z","3_z","4_z","5_z"),pch="cluster mu z"),cex=4)
   if(save_fig)
   {

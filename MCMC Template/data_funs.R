@@ -25,7 +25,7 @@ load_charity_data<-function()
 
 load_big5_data<-function()
 {
-  rawdata=read.table('./Data/big5.csv', header = TRUE, fill = TRUE)
+  rawdata=read.table('../Data/big5.csv', header = TRUE, fill = TRUE)
   rawdata <- select(rawdata, E1:E10) #only extraversion questions
   rawdata[rawdata == 0] <- NA
   rawdata <- rawdata[!apply(is.na(rawdata),1,any),]
