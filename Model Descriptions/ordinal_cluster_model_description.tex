@@ -8,7 +8,6 @@
 \renewcommand{\baselinestretch}{1.1}\pagestyle{fancy}
 \pagestyle{fancy}
 \usepackage{amsfonts}
-\usepackage{bbold}
 \usepackage{listings}
 \usepackage{amsthm}
 \usepackage{amssymb,amsmath}
@@ -30,55 +29,39 @@
 \begin{document}
 	
 	\begin{center}
-		Description of Basic Cluster Model
+		Description of Ordinal Cluster Model
 	\end{center}
 	
-\textbf{Probability model:} Let $X_{ij}\in\{0,\dots,k_{max}\}$. Then for $0\leq k\leq k_{max}$,
+\textbf{Response model model:} Let $X_{ij}\in\{0,\dots,k_{max}\}$, where $1\leq j\leq n_{respondents}$ is the respondent index and $1\leq i\leq n_{items}$ is the item index. Our parameters are respondent parameters $\theta_j$, item parameters for each ordinal response category $\tau_{i,k}$, respondent latent space positions $z_j$, and item-response latent space parameters $w_{i,k}$.  Then for $0\leq k\leq k_{max}$,
 
-$$\tx{logit}(P(X_{ij}=k))=\theta_j+\beta_i+\tau_{i,k}-||{z}_j-w_{i,k}||_2^2$$ where we enforce the constraint $\tau_{i,0}=0$ to avoid confounding with baseline question difficulty $\beta_i$. Note that this differs slightly from the standard ordinal model in that we are modeling logits of $P(X_{ij}=k)$ instead of $P(X_{ij}<k)$. This is necessary when the ordinal responses are given different latent positions, as otherwise we would need the constraint $||{z}_k-{w}_{i,k}||_2^2\geq ||z_j-{w}_{i,k+1}||_2^2$ for all $i$, which would not be meaningful to enforce.  For calculating likelihoods, we have $$P(X_{ij}=k)\propto\tx{sigmoid}(\theta_j+\beta_i+\tau_{i,k}-||{w}_{i,k}-{z}_j||_2^2)$$ This is not equality, as we need to normalize over $k$ to ensure that the probabilities sum to one. \\
+$$P(X_{ij}=k)=c\,\tx{exp}(\theta_j+\tau_{i,k}-||{z}_j-w_{i,k}||_2^2)$$ Where $c$ is the normalization constant  $c=\sum_{k=0}^{k_{max}}\exp(\theta_j+\tau_{i,k}-||z_j-w_{i,k}||_2^2)$; this is just one way of writing the softmax function. \\
 
 
-\textbf{Priors}:
+\textbf{Priors} On the latent space parameters $z_j$ and $w_{i,k}$ we assign a Gaussian mixture prior with fixed number of clusters $G$:
 
 $$z_j,w_{i,k}\sim\sum_{g=1}^{G}\lambda_{g}MVN_d(\mu_{g},\sigma_{g}I_d)$$
 
+The prior probability for cluster assignment is Dirichlet with parameter $\nu$ for conjugacy:
 
+$$[\lambda_1,\dots,\lambda_G]\sim \tx{Dirichlet}(\nu)$$ and means are given normal hyperiors: $$\forall g:\,\,\mu_{g}\sim MVN_d(0,\sigma_\mu^2I_d)$$ All prior variances are given uninformative Inverse-Gamma hyperiors:\
 
-$$\lambda\sim \tx{Dirichlet}(\nu)$$ $$\forall g:\,\,\sigma_{g}\sim \sigma_0^2\tx{Inv}\chi_\alpha^2$$ $$\forall g:\,\,\mu_{g}\sim MVN_d(0,\omega^2I_d)$$
-$$\theta\sim N(0,\sigma_\theta^2I_{n_z}),\beta\sim N(0,\sigma_\beta^2 I_{n_w}),\tau_{i,k}\sim N(0,\sigma_\tau^2)$$
-$$\sigma_\theta^2\sim \tx{Inv-Gamma}(a,b);\tx{  }\sigma_\beta\tx{ kept fixed}$$
- For hyper-parameter values we let $a=1000$, $b=100$, $\sigma_\beta^2=10$, $\nu_{g}$ (for all $g_z,g_w$). We also let $G=4$, although these can be tuned through model selection procedures. \\
-
-\textbf{Proposal distributions.} For $z,w,\beta,\theta$, and $\tau$, proposed values are drawn from normal distributions centered around the previous value with tunable proposal standard deviations, which has the advantage of being symmetric so terms such as $p(z^{(1)}\rightarrow z')/p(z'\rightarrow z^{(1)})=1$. For example, $$p(z^{(1)}\rightarrow z')\sim N(z^{(1)},\sigma^2_{z_{prop}})$$ For testing the algorithm we set proposal standard deviations to 5.\\
-
-For cluster parameters $K,\lambda,\sigma,$ and $\mu$ we do not use MCMC as the posteriors can be sampled directly, as can be seen below.\\
-
-
-
-
- \textbf{Posteriors:}  For $z,w,\beta$, and $\theta$, the posterior distributions cannot be computed analytically so we use the following relationships for MCMC sampling:
+ $$\sigma_\theta^2,\sigma_\tau^2,\sigma_\mu^2,\forall g:\,\,\sigma_{g} \sim\tx{InvGamma}(\epsilon,\epsilon)$$ where $\epsilon$ is set to be sufficiently small as to be uninformative. If the sampler behaves poorly by estimating prior variances that are unsuitably large or small, these priors may be changed to be informative in order to force estimated parameters to fall within a reasonable range.\\
  
- $$\pi(\beta_i|\textbf{X},\textbf{Z},\textbf{W},\theta)\propto \pi(\beta_i)\prod_{j}P(X_{ik}|\beta_i,\theta_k,z_j,w_{i,k},\tau_{i,k})$$  
-  $$\pi(\theta_k|\textbf{X},\textbf{Z},\textbf{W},\theta,\sigma_\theta^2,\tau_{i,k})\propto \pi(\theta_k|\sigma_\theta^2)\prod_{i}P(X_{ik}|\beta_i,\theta_k,z_j,w_{i,k},\tau_{i,k})$$ 
-   $$\pi(w_{i,k}|\textbf{X},\textbf{Z},\textbf{W},\theta,\sigma_w^2)\propto \pi(w_{i,k}|\sigma_w^2)\prod_{j}P(X_{ik}|\beta_i,\theta_k,z_j,w_{i,k}),\tau_{i,k}$$ 
-    $$\pi(z_j|\textbf{X},\textbf{W},\beta,\theta,\sigma_z^2)\propto \pi(z_j|\sigma_z^2)\prod_{i}P(X_{ik}|\beta_i,\theta_k,z_j,w_{i,k},\tau_{i,k})$$ 
-        $$\pi(\tau_{i,k}|\textbf{X},\textbf{W},\beta,\theta,\sigma_z^2)\propto \pi(\tau_{i,k}|\sigma_z^2)\prod_{i}P(X_{ik}|\beta_i,\theta_k,z_j,w_{i,k},\tau_{i,k})$$ \
-    For the cluster parameters, the posteriors have closed forms so they can be sampled directly. This method is analogous to that used in Handcock, Raftery, and Tantrum (2007).
+
+\textbf{Sampling.} Sampling is Gibbs on each set of parameters. For parameters without conjugate Gibbs distributions, Metropolis-Hastings is used with normal proposals and variances adjusted adaptively throughout the sampling (see http://probability.ca/jeff/ftpdir/adaptex.pdf)\\
+
+
+The parameters $\mu_g,\sigma_x^2,$ and $K_{z_j},K_{w_i}$ have conjugate Gibbs distributions and can be sampled directly. This method is analogous to that used in Handcock, Raftery, and Tantrum (2007).
     
-    $$\mu_{g}|\tx{others}\sim MVN\left(\frac{m_g\overline{z}_g}{m_g+\sigma_g^2/\omega^2},\frac{\sigma_g^2}{m_g+\sigma_g^2/\omega^2}\right)$$ $$\sigma_g^2|\tx{others}\sim (\sigma_0^2+ds_g)$$ $$P(K_{z_j}=g|\tx{others})=\frac{\lambda_{g}\phi_d(z_j;\mu_{g},\sigma_{g}^2I_d)}{\sum_{g=1}^{G}\lambda_{g}\phi_d(z_j;\mu_{g},\sigma_{g}^2I_d)}$$ $$P(K_{w_{i,k}}=g|\tx{others})=\frac{\lambda_{g}\phi_d(w_{i,k};\mu_{g},\sigma_{g}^2I_d)}{\sum_{g=1}^{G}\lambda_{g}\phi_d(w_{i,k};\mu_{g},\sigma_{g}^2I_d)}$$where $$m_g=\sum_{k:K_{z_j}=g}1+\sum_{i:K_{w_{i,k}}=g}1$$ $$s_g^2=\frac{1}{d}\left(\sum_{k:K_{z_j}=g}(z_j-\mu_g)^T(z_j-\mu_g)+\sum_{i:K_{w_{i,k}}=g}(w_{i,k}-\mu_g)^T(w_{i,k}-\mu_g)\right)$$ $$\overline{z}_g=\frac{1}{m_g}\left(\sum_{k:K_{z_j}=g}z_j+\sum_{k:K_{z_j}=g}z_j\right)$$ and $\phi_d$ is the d-dimensional multivariate normal density.\\ 
-     
-  \textbf{Rejection probabilities} are  $$r(z'_k,z_j^{(t)})=\frac{\pi(z_j'|z_{-j},\beta,\theta,\textbf{W})}{\pi(z_j^{(t)}|z_{-j},\beta,\theta,\textbf{W})}$$ $$r(w'_i,w_{i,k}^{(t)})=\frac{\pi(w_{i,k}'|w_{-i},\beta,\theta,\textbf{Z})}{\pi(w_{i,k}^{(t)}|w_{-i},\beta,\theta,\textbf{Z})}$$
-Rejection probabilities are analogous for $\theta$ and $\beta$.\\
+    $$\mu_{g}|\tx{others}\sim MVN\left(\frac{m_g\overline{z}_g}{m_g+\sigma_g^2/\omega^2},\frac{\sigma_g^2}{m_g+\sigma_g^2/\omega^2}\right)$$ $$\sigma_g^2|\tx{others}\sim \tx{InvGamma}\left(\epsilon+\frac{m_g}{2},\epsilon+\frac{m_g}{2}(\overline{z}_g-\mu_g)\right)$$ $$P(K_{z_j}=g|\tx{others})=\frac{\lambda_{g}\phi_d(z_j;\mu_{g},\sigma_{g}^2I_d)}{\sum_{g=1}^{G}\lambda_{g}\phi_d(z_j;\mu_{g},\sigma_{g}^2I_d)}$$ $$P(K_{w_{i,k}}=g|\tx{others})=\frac{\lambda_{g}\phi_d(w_{i,k};\mu_{g},\sigma_{g}^2I_d)}{\sum_{g=1}^{G}\lambda_{g}\phi_d(w_{i,k};\mu_{g},\sigma_{g}^2I_d)}$$ where $$m_g=\sum_{k:K_{z_j}=g}1+\sum_{i:K_{w_{i,k}}=g}1$$ $$s_g^2=\frac{1}{d}\left(\sum_{k:K_{z_j}=g}(z_j-\mu_g)^T(z_j-\mu_g)+\sum_{i:K_{w_{i,k}}=g}(w_{i,k}-\mu_g)^T(w_{i,k}-\mu_g)\right)$$ $$\overline{z}_g=\frac{1}{m_g}\left(\sum_{k:K_{z_j}=g}z_j+\sum_{k:K_{z_j}=g}z_j\right)$$ and $\phi_d$ is the d-dimensional multivariate normal density.\\ 
+  
 
 \textbf{Overall procedure.} We preform the steps in the following order:
 
 \begin{enumerate}
-	\item Propose and update \textbf{z}. 
-	\item Propose and update \textbf{w}.
-	\item Sample $K,\mu_{g},\sigma_{g}^2,$ and $\lambda_{g}$ from their posterior distributions.
-	\item Propose and update $\theta$.
-	\item Update $\sigma_\theta^2$ through MCMC.
-	\item Propose and update $\beta$.
+	\item Propose and update $z$ and $w$.
+	\item Propose and update $\theta$, and $\tau$, sampling $\sigma_\theta^2$ and $\sigma_\tau^2$ after each respectively.
+	\item Sample $K,\mu_{g},\sigma_{g}^2,$ $\lambda_{g}$, and $\sigma_\mu^2$ from their posterior distributions.
 \end{enumerate}
 
 

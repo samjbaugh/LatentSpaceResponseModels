@@ -164,6 +164,6 @@ load_data=load_charity_data
 ordinal=T
 run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_data,ordinal=T)
 
-# save_filename=file.path(paste('Saved_output/saved_output_config_',config_number,'_seed_',myseed,'_data_',dataname,sep=''))
-# load(save_filename,verb=T)
+save_filename=file.path(paste('Saved_output/saved_output_config_',config_number,'_seed_',myseed,'_data_',dataname,sep=''))
+load(save_filename,verb=T)
 # print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))

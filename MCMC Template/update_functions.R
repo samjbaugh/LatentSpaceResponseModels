@@ -243,6 +243,11 @@ update_stored_vars<-function()
     gms[ii]=dim(temp)[1]
     gmeans[ii,]=apply(temp,2,mean)
     gsd[ii]=sqrt(sum((temp-current_values$mu[ii,])^2)/2)
+    if(gms[ii]==0)
+    {
+      gmeans[ii,]=c(0,0)
+      gsd[ii]=0
+    }
   }
   return(list('gm'=gms,'gmeans'=gmeans,'gsd'=gsd))
 }
