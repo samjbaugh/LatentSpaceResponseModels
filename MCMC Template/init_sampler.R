@@ -37,6 +37,8 @@ initialize_sampler<-function(config_number,ordinal=F)
   if(ordinal)
   {
     w_init=matrix(NA,nw*ntau,2)
+  }else{
+    w_init=matrix(NA,nw,2)
   }
   colnames(w_init)<-c('coord1','coord2')
   

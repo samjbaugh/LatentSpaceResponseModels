@@ -29,7 +29,7 @@ plot_latent <- function(stored_parameters,store_index,title="",save_fig=F,save_f
   p0<-p0+geom_point(aes(x=coord1,y=coord2,col="w"),data=z,cex=3)
   p0<-p0+geom_point(aes(x=coord1,y=coord2,col="z"),data=w,cex=3)
   p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')+ggtitle(paste('Latent space sample at iteration',store_index))
-  if(save_tf)
+  if(save_fig)
   {
     png(save_filename)
     print(p0)
@@ -44,10 +44,10 @@ plot_latent_cluster <- function(stored_parameters,store_index,mytitle="",save_fi
 {
   z=data.frame(stored_parameters$z[[store_index]]) #data.frame(matrix(stored_parameters$z[M,],nz,2))
   names(z)<-c('coord1','coord2')
+  nz=dim(z)[1]
   
   w=data.frame(stored_parameters$w[[store_index]]) #data.frame(matrix(stored_parameters$w[M,],nw,2))
   names(w)<-c('coord1','coord2')
-  nz=dim(z)[1]
   nw=dim(w)[1]
   ncluster=2 #max(c(stored_parameters$K_z[[store_index]],stored_parameters$K_w[[store_index]]))
   
@@ -74,7 +74,8 @@ plot_latent_cluster <- function(stored_parameters,store_index,mytitle="",save_fi
   mu$r=stored_parameters$sigma[[store_index]]
 
   p0<-ggplot()+geom_point(aes(x=coord1,y=coord2,pch=K,col=gender),z,cex=2)
-  p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')+ggtitle(paste('Latent space sample at k=',mytitle,sep=''))
+  p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')
+  p0<-p0+ggtitle(paste('Latent space sample at k=',mytitle,sep=''))
   p0<-p0+geom_point(aes(x=coord1,y=coord2),pch=8,col='black',data=mu)
   p0<-p0+geom_circle(aes(x0=coord1,y0=coord2,r=r),data=mu)
   p0<-p0+geom_text(aes(x=coord1,y=coord2,label=name),hjust=2,vjust=2,data=w,fontface="bold")
@@ -82,7 +83,7 @@ plot_latent_cluster <- function(stored_parameters,store_index,mytitle="",save_fi
   if(plot_pie)
   {p0<-p0+geom_scatterpie(aes(x=coord1,y=coord2),data=w,cols=c("cluster1","cluster2","cluster3"))}
   
-  if(save_tf)
+  if(save_fig)
   {
     png(save_filename)
     print(p0)
@@ -97,6 +98,8 @@ plot_latent_ordinal_cluster <- function(stored_parameters,store_index,mytitle=""
 {
   z=data.frame(stored_parameters$z[[store_index]]) #data.frame(matrix(stored_parameters$z[M,],nz,2))
   w=data.frame(stored_parameters$w[[store_index]]) #data.frame(matrix(stored_parameters$w[M,],nw,2))
+  # nw=dim(w)[1]
+  # nz=dim(z)[1]
   names(z)<-c('coord1','coord2')
   names(w)<-c('coord1','coord2')
   
@@ -105,7 +108,7 @@ plot_latent_ordinal_cluster <- function(stored_parameters,store_index,mytitle=""
   
   temp_w=sapply(stored_parameters$K_w[[store_index]],function(x) paste(toString(x)))
   w$K=as.factor(temp_w)
-  w$wname=c(rep("w k=1",nw),rep("w k=2",nw),rep("w k=3",nw),rep("w k=4",nw),rep("w k=5",nw))
+  w$wname=c(sapply(1:ntau,function(ii) rep(paste("w_k=",ii,sep=''),nw)))
   
   mu=data.frame(stored_parameters$mu[[store_index]])
   colnames(mu)<-c('coord1','coord2')

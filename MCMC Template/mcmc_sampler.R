@@ -2,6 +2,7 @@ require('invgamma')
 require('ggplot2')
 require('pdist')
 require('ggforce')
+require('progress')
 source('update_functions.R')
 source('init_sampler.R')
 source('data_funs.R')
@@ -74,8 +75,10 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
     start_index=2
   }
   
-  pb <- txtProgressBar(max = M, style = 3)
-    
+  pb <- progress_bar$new(
+    format = " producing samples [:bar] :percent eta: :eta",
+    total = M, clear = FALSE, width= 120)
+  
   for(jj in start_index:M)
   {
     
@@ -84,7 +87,7 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
     store=jj%%store_iter==0
     storej=floor(jj/store_iter)
     
-    setTxtProgressBar(pb, jj)
+    pb$tick()
     
     for(varname in varname_list)
     {
@@ -139,15 +142,19 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
     
     if(jj%%plot_iter==0)
     {
-      print('acceptance rates:')
-      print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))
-      plot_fun(stored_parameters,storej,mytitle=toString(jj),save_fig=T,save_filename=paste(plot_dirname,'/iteration_',jj,'.png',sep=''))
+      # print('acceptance rates:')
+      # print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))
+      plot_fun(stored_parameters,storej,mytitle=toString(jj),save_fig=F,save_filename=paste(plot_dirname,'/iteration_',jj,'.png',sep=''))
+      save(stored_parameters,stored_likelihoods,
+           current_values,stored_vars,hyperparameters,
+           proposal_sigs,acceptance_rates,current_seed,
+           varname_list,update_sigma_tf,file=save_filename)
     }
   }
 }
 
 M=10000
-myseed=223
+myseed=555
 config_number=1
 plot_iter=100
 # load_data=load_spelling_data
@@ -155,9 +162,9 @@ plot_iter=100
 #non-ordinal cluster:
 # run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_spelling_data)
 #ordinal cluster:
-load_data=load_big5_data
-ordinal=T
-run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_data,ordinal=T)
+load_data=load_spelling_data
+ordinal=FALSE
+run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_data,ordinal=ordinal)
 
 save_filename=file.path(paste('Saved_output/saved_output_config_',config_number,'_seed_',myseed,'_data_',dataname,sep=''))
 load(save_filename,verb=T)

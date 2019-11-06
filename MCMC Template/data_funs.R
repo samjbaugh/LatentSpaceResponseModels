@@ -5,6 +5,8 @@ load_spelling_data<-function()
   assign("X",raw_data[,2:5],envir=.GlobalEnv)
   assign("dataname","spelling",envir=.GlobalEnv)
   assign("gender",factor(raw_data[,1],levels=c(0,1),labels=c('female','male')),envir=.GlobalEnv)
+  assign('nz',dim(X)[1],envir=.GlobalEnv)
+  assign('nw',dim(X)[2],envir=.GlobalEnv)
 }
 
 load_charity_data<-function()
@@ -45,4 +47,12 @@ load_big5_data<-function()
   assign('minord',min(ordinals),envir=.GlobalEnv)
   assign('maxord',max(ordinals),envir=.GlobalEnv)
   assign('ntau',length(ordinals),envir=.GlobalEnv)
+}
+
+load_verbal_agression_data<-function()
+{
+  data(VerbAgg)
+  assign("X",VerbAgg,envir=.GlobalEnv)
+  assign('nz',dim(X)[1],envir=.GlobalEnv)
+  assign('nw',dim(X)[2],envir=.GlobalEnv)
 }
