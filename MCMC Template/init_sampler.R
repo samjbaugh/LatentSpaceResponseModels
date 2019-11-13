@@ -115,11 +115,11 @@ initialize_sampler<-function(config_number,ordinal=F)
     init_values$sigma_tau=sigma_tau_init
     
     assign("varname_list",c("z","w","theta","logscale","tau"),envir=.GlobalEnv)
-    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=TRUE,"logscale"=FALSE,"tau"=TRUE),envir=.GlobalEnv)
+    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=FALSE,"logscale"=FALSE,"tau"=TRUE),envir=.GlobalEnv)
     assign("latent_tf",list("z"=TRUE,"w"=TRUE,"theta"=FALSE,"logscale"=FALSE,"tau"=FALSE),envir=.GlobalEnv)
   }else{
     assign("varname_list",c("z","w","theta","logscale","beta"),envir=.GlobalEnv)
-    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=TRUE,"logscale"=FALSE,"beta"=FALSE),envir=.GlobalEnv)
+    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=FALSE,"logscale"=FALSE,"beta"=FALSE),envir=.GlobalEnv)
     assign("latent_tf",list("z"=TRUE,"w"=TRUE,"theta"=FALSE,"logscale"=FALSE,"beta"=FALSE),envir=.GlobalEnv)
   }
   

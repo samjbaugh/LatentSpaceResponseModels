@@ -51,8 +51,18 @@ load_big5_data<-function()
 
 load_verbal_agression_data<-function()
 {
-  raw_data=read.table('../Data/spelling.dat')
-  assign("X",VerbAgg,envir=.GlobalEnv)
+  require('irtrees')
+  data("VerbAgg3")
+  
+  assign("X",rawdata[!apply(is.na(rawdata),1,any),],envir=.GlobalEnv)
   assign('nz',dim(X)[1],envir=.GlobalEnv)
   assign('nw',dim(X)[2],envir=.GlobalEnv)
+  
+  assign("dataname","charity",envir=.GlobalEnv)
+  
+  ordinal_categories=unique(c(as.matrix(X)))
+  assign("ordinals",ordinal_categories[!is.na(ordinal_categories)],envir=.GlobalEnv)
+  assign('minord',min(ordinals),envir=.GlobalEnv)
+  assign('maxord',max(ordinals),envir=.GlobalEnv)
+  assign('ntau',length(ordinals),envir=.GlobalEnv)
 }

@@ -31,6 +31,23 @@ procrustes_postprocess<-function(stored_parameters,stored_likelihoods)
   }
   return(matched_parameters)
 }
+
+cluster_relabeling<-function(stored_parameters,order_var='sigma')
+{
+  ncluster=length(unique(stored_parameters$K_z[[1]]))
+  relabeled_parameters=stored_parameters
+  for(ii in 1:length(stored_parameters))
+  {
+    order_stat=relabeled_parameters[[order_var]][[ii]]
+    new_ordering=order(order_stat)
+    relabeled_parameters$sigma=relabeled_parameters$sigma[[ii]][new_ordering]
+    relabeled_parameters$mu=relabeled_parameters$mu[[ii]][new_ordering,]
+    relabeled_parameters$K_w[[ii]]=factor(relabeled_parameters$K_w[[ii]],levels=1:ncluster,labels=new_ordering)
+    relabeled_parameters$K_z[[ii]]=factor(relabeled_parameters$K_z[[ii]],levels=1:ncluster,labels=new_ordering)
+  }
+  
+  return(relabeled_parameters)
+}
 # 
 # load_charity_data()
 # load(file='./Saved_output/saved_output_config_1_seed_555_data_spelling',verb=T)

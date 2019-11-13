@@ -20,7 +20,7 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
   load_data()
 
   ndim<<-2
-  ncluster<<-2
+  assign("ncluster",2,envir = .GlobalEnv)
   
   store_iter=1
   batch_size=2000
@@ -164,7 +164,7 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
 }
 
 M=10000
-myseed=777
+myseed=256
 config_number=1
 plot_iter=10
 load_data=load_charity_data
