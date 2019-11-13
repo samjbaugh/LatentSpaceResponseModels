@@ -34,7 +34,7 @@
 	
 \textbf{Response model model:} Let $X_{ij}\in\{0,\dots,k_{max}\}$, where $1\leq j\leq n_{respondents}$ is the respondent index and $1\leq i\leq n_{items}$ is the item index. Our parameters are respondent parameters $\theta_j$, item parameters for each ordinal response category $\tau_{i,k}$, respondent latent space positions $z_j$, and item-response latent space parameters $w_{i,k}$.  Then for $0\leq k\leq k_{max}$,
 
-$$P(X_{ij}=k)=c\,\tx{exp}(\theta_j+\tau_{i,k}-||{z}_j-w_{i,k}||_2^2)$$ Where $c$ is the normalization constant  $c=\sum_{k=0}^{k_{max}}\exp(\theta_j+\tau_{i,k}-||z_j-w_{i,k}||_2^2)$; this is just one way of writing the softmax function. \\
+$$P(X_{ij}=k)=c\,\tx{exp}(\theta_j+\tau_{i,k}-\gamma||{z}_j-w_{i,k}||_2^2)$$ Where $c$ is the normalization constant  $c=\sum_{k=0}^{k_{max}}\exp(\theta_j+\tau_{i,k}-\gamma||z_j-w_{i,k}||_2^2)$; this is just one way of writing the softmax function. \\
 
 
 \textbf{Priors} On the latent space parameters $z_j$ and $w_{i,k}$ we assign a Gaussian mixture prior with fixed number of clusters $G$:

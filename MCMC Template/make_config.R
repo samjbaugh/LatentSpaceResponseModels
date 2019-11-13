@@ -1,7 +1,7 @@
 nu_config=10
 rate_all_config=0.001
 shape_all_config=0.001
-omega_init_config=3
+omega_init_config=5
 sigma_theta_config=.1
 sigma_mu_config=2
 sigma_beta_config=1

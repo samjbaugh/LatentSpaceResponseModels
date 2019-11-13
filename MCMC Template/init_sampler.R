@@ -64,6 +64,13 @@ initialize_sampler<-function(config_number,ordinal=F)
     gsd[ii]=sqrt(sum((temp-gmeans[ii,])^2)/2)
   }
   
+  all_latent_init=rbind(z_init,w_init)
+  logscale_init=matrix(log(sqrt(mean(all_latent_init^2))),1,1)
+  z_init=z_init/c(sqrt(mean(z_init^2)))
+  w_init=w_init/c(sqrt(mean(w_init^2)))
+  mu_init=mu_init/c(exp(logscale_init))
+  sigma_init=sigma_init/c(exp(logscale_init))
+  
   stored_vars_init=list()
   stored_vars_init$gm=gms
   stored_vars_init$gmeans=gmeans
@@ -91,7 +98,9 @@ initialize_sampler<-function(config_number,ordinal=F)
                    "lambda"=lambda_init,
                    "K_z"=K_z_init,
                    "K_w"=K_w_init,
-                   "omega"=omega_init)
+                   "omega"=omega_init,
+                   "logscale"=logscale_init,
+                   "sigma_logscale"=.1)
   
   if(ordinal)
   {
@@ -105,11 +114,13 @@ initialize_sampler<-function(config_number,ordinal=F)
     init_values$tau=tau_init
     init_values$sigma_tau=sigma_tau_init
     
-    assign("varname_list",c("z","w","theta","tau"),envir=.GlobalEnv)
-    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=TRUE,"tau"=TRUE),envir=.GlobalEnv)
+    assign("varname_list",c("z","w","theta","logscale","tau"),envir=.GlobalEnv)
+    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=TRUE,"logscale"=FALSE,"tau"=TRUE),envir=.GlobalEnv)
+    assign("latent_tf",list("z"=TRUE,"w"=TRUE,"theta"=FALSE,"logscale"=FALSE,"tau"=FALSE),envir=.GlobalEnv)
   }else{
-    assign("varname_list",c("z","w","theta","beta"),envir=.GlobalEnv)
-    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=TRUE,"beta"=FALSE),envir=.GlobalEnv)
+    assign("varname_list",c("z","w","theta","logscale","beta"),envir=.GlobalEnv)
+    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=TRUE,"logscale"=FALSE,"beta"=FALSE),envir=.GlobalEnv)
+    assign("latent_tf",list("z"=TRUE,"w"=TRUE,"theta"=FALSE,"logscale"=FALSE,"beta"=FALSE),envir=.GlobalEnv)
   }
   
   proposal_sigs=list()

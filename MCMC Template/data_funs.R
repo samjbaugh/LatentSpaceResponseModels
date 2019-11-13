@@ -51,7 +51,7 @@ load_big5_data<-function()
 
 load_verbal_agression_data<-function()
 {
-  data(VerbAgg)
+  raw_data=read.table('../Data/spelling.dat')
   assign("X",VerbAgg,envir=.GlobalEnv)
   assign('nz',dim(X)[1],envir=.GlobalEnv)
   assign('nw',dim(X)[2],envir=.GlobalEnv)

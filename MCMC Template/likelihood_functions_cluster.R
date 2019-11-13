@@ -2,7 +2,7 @@ likelihood_funs=list()
 
 likelihood_z<-function(given_z)
 {
-  wz_dist=euc_dist(given_z,current_values$w)
+  wz_dist=c(exp(current_values$logscale))*euc_dist(given_z,current_values$w)
   bt_mat=outer(c(current_values$theta),c(current_values$beta),'+')
   retval=sigmoid((2*X-1)*(bt_mat-wz_dist))
   return(rowSums(retval))
@@ -11,7 +11,7 @@ likelihood_funs$z=likelihood_z
 
 likelihood_w<-function(given_w)
 {
-  wz_dist=euc_dist(current_values[['z']],given_w)
+  wz_dist=c(exp(current_values$logscale))*euc_dist(current_values[['z']],given_w)
   bt_mat=outer(c(current_values$theta),c(current_values$beta),'+')
   retval=sigmoid((2*X-1)*(bt_mat-wz_dist))
   return(colSums(retval))
@@ -20,7 +20,7 @@ likelihood_funs$w=likelihood_w
 
 likelihood_theta<-function(given_theta)
 {
-  wz_dist=euc_dist(current_values$z,current_values$w)
+  wz_dist=c(exp(current_values$logscale))*euc_dist(current_values$z,current_values$w)
   bt_mat=outer(c(given_theta),c(current_values$beta),'+')
   retval=sigmoid((2*X-1)*(bt_mat-wz_dist))
   return(rowSums(retval))
@@ -29,16 +29,26 @@ likelihood_funs$theta=likelihood_theta
 
 likelihood_beta<-function(given_beta)
 {
-  wz_dist=euc_dist(current_values$z,current_values$w)
+  wz_dist=c(exp(current_values$logscale))*euc_dist(current_values$z,current_values$w)
   bt_mat=outer(c(current_values$theta),c(given_beta),'+')
   retval=sigmoid((2*X-1)*(bt_mat-wz_dist))
   return(colSums(retval))
 }
 likelihood_funs$beta=likelihood_beta
 
+
+likelihood_logscale<-function(given_logscale)
+{
+  wz_dist=c(exp(given_logscale))*euc_dist(current_values$z,current_values$w)
+  bt_mat=outer(c(current_values$theta),c(current_values$beta),'+')
+  retval=sigmoid((2*X-1)*(bt_mat-wz_dist))
+  return(sum(retval))
+}
+likelihood_funs$logscale=likelihood_logscale
+
 calculate_full_likelihood<-function(stores,kk)
 {
-  wz_dist=euc_dist(stores$z[[kk]],stores$w[[kk]])
+  wz_dist=c(exp(stores$logscale[[kk]]))*euc_dist(stores$z[[kk]],stores$w[[kk]])
   bt_mat=outer(c(stores$theta[[kk]]),c(stores$beta[[kk]]),'+')
   retval=sigmoid((2*X-1)*(bt_mat-wz_dist))
   return(sum(retval))
@@ -64,3 +74,4 @@ prior_funs$beta=function(x) regular_prior(x,'beta')
 prior_funs$theta=function(x) regular_prior(x,'theta')
 prior_funs$w=function(x) cluster_prior(x,'w')
 prior_funs$z=function(x) cluster_prior(x,'z')
+prior_funs$logscale=function(x) regular_prior(x,'logscale')

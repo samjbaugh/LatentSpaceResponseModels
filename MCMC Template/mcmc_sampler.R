@@ -7,7 +7,7 @@ source('update_functions.R')
 source('init_sampler.R')
 source('data_funs.R')
 
-run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordinal)
+run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordinal,save_fig=T)
 {
   if(ordinal){
     source('likelihood_functions_ordinal.R')
@@ -71,17 +71,17 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
     
 
     ###sample
-    plot_fun(stored_parameters,1,mytitle='Initial Configuration',save_fig=T,save_filename=paste(plot_dirname,'/initial_configuration.png',sep=''))
+    plot_fun(stored_parameters,1,mytitle='Initial Configuration',save_fig=save_fig,save_filename=paste(plot_dirname,'/initial_configuration.png',sep=''))
     start_index=2
   }
   
   pb <- progress_bar$new(
-    format = " producing samples [:bar] :percent eta: :eta",
-    total = M, clear = FALSE, width= 120)
+    format = " producing samples [:bar] :percent eta: :eta\n",
+    total = M, clear = T, width= 80)
   
   for(jj in start_index:M)
   {
-    
+    print(jj)
     current_seed=runif(1)*1e9 #for continuation purposes
     set.seed(current_seed)
     store=jj%%store_iter==0
@@ -98,6 +98,15 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
       if(store) {stored_parameters[[varname]][[storej]]=out$newvalue}
       
       acceptance_rates[[varname]][jj]=mean(out$accepts)
+      
+      if(latent_tf[[varname]])
+      {
+        normscale=sqrt(mean(rbind(current_values$z,current_values$w)^2))
+        global_update("current_values","z",current_values$z/sqrt(mean(current_values$z^2)))
+        global_update("current_values","w",current_values$w/sqrt(mean(current_values$w^2)))
+        global_update("current_values","mu",current_values$mu/normscale)
+        global_update("current_values","sigma",current_values$sigma/normscale)
+      }
       
       if(update_sigma_tf[[varname]])
       {
@@ -143,8 +152,9 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
     if(jj%%plot_iter==0)
     {
       # print('acceptance rates:')
-      # print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))
-      plot_fun(stored_parameters,storej,mytitle=toString(jj),save_fig=F,save_filename=paste(plot_dirname,'/iteration_',jj,'.png',sep=''))
+      print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))
+      print(exp(current_values$logscale))
+      plot_fun(stored_parameters,storej,mytitle=toString(jj),save_fig=save_fig,save_filename=paste(plot_dirname,'/iteration_',jj,'.png',sep=''))
       save(stored_parameters,stored_likelihoods,
            current_values,stored_vars,hyperparameters,
            proposal_sigs,acceptance_rates,current_seed,
@@ -154,17 +164,14 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,load_data,ordin
 }
 
 M=10000
-myseed=555
+myseed=777
 config_number=1
-plot_iter=100
+plot_iter=10
+load_data=load_charity_data
+ordinal=T
 # load_data=load_spelling_data
-# ordinal=F
-#non-ordinal cluster:
-# run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_spelling_data)
-#ordinal cluster:
-load_data=load_spelling_data
-ordinal=FALSE
-run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_data,ordinal=ordinal)
+# ordinal=FALSE
+run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_data,ordinal=ordinal,save_fig=T)
 
 save_filename=file.path(paste('Saved_output/saved_output_config_',config_number,'_seed_',myseed,'_data_',dataname,sep=''))
 load(save_filename,verb=T)
