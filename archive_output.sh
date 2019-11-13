@@ -1,9 +1,9 @@
-mv -r MCMC\ Template/Images/* ../OutputArchiveLatentSpace/Images
-mv -r MCMC\ Template/Saved_Output/* ../OutputArchiveLatentSpace/SavedOutput
-for x in $(ls Test\ Runs)
+mv MCMC_Template/Images/* ../OutputArchiveLatentSpace/Images
+mv MCMC_Template/Saved_output/* ../OutputArchiveLatentSpace/Saved_output
+for x in $(ls Test_Runs)
 do
-	mv -r Test\ Runs/$x/Images/* ../OutputArchiveLatentSpace/Images
-	mv -r Test\ Runs/$x/Saved_Output/* ../OutputArchiveLatentSpace/SavedOutput
+	mv Test_Runs/$x/Images/* ../OutputArchiveLatentSpace/Images
+	mv Test_Runs/$x/Saved_output/* ../OutputArchiveLatentSpace/Saved_output
 done
 
 
