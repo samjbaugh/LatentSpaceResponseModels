@@ -54,11 +54,11 @@ load_verbal_agression_data<-function()
   require('irtrees')
   data("VerbAgg3")
   
-  assign("X",rawdata[!apply(is.na(rawdata),1,any),],envir=.GlobalEnv)
+  assign("X",VerbAgg3[,3:dim(VerbAgg3)[2]]-1,envir=.GlobalEnv)
   assign('nz',dim(X)[1],envir=.GlobalEnv)
   assign('nw',dim(X)[2],envir=.GlobalEnv)
   
-  assign("dataname","charity",envir=.GlobalEnv)
+  assign("dataname","verbagg",envir=.GlobalEnv)
   
   ordinal_categories=unique(c(as.matrix(X)))
   assign("ordinals",ordinal_categories[!is.na(ordinal_categories)],envir=.GlobalEnv)

@@ -1,0 +1,68 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1.25in]{geometry}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{ mathrsfs }
+
+\renewcommand{\baselinestretch}{1.1}\pagestyle{fancy}
+\pagestyle{fancy}
+\usepackage{amsfonts}
+\usepackage{listings}
+\usepackage{amsthm}
+\usepackage{amssymb,amsmath}
+\usepackage{textpos}
+\usepackage{enumerate}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{mathtools}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\cov}{\textnormal{cov}}
+\newcommand{\tx}[1]{\textnormal{#1}}
+\usepackage{graphicx}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+	
+	\begin{center}
+		Description of Ordinal Cluster Model
+	\end{center}
+	
+\textbf{Response model model:} Let $X_{ij}\in\{0,\dots,k_{max}\}$, where $1\leq j\leq n_{respondents}$ is the respondent index and $1\leq i\leq n_{items}$ is the item index. Our parameters are respondent parameters $\theta_j$, item parameters for each ordinal response category $\tau_{i,k}$, respondent latent space positions $z_j$, and item-response latent space parameters $w_{i,k}$.  Then for $0\leq k\leq k_{max}$,
+
+$$P(X_{ij}=k)=c\,\tx{exp}(\theta_j+\tau_{i,k}-\gamma||{z}_j-w_{i,k}||_2^2)$$ Where $c$ is the normalization constant  $c=\sum_{k=0}^{k_{max}}\exp(\theta_j+\tau_{i,k}-\gamma||z_j-w_{i,k}||_2^2)$; this is just one way of writing the softmax function. \\
+
+
+\textbf{Priors} On the latent space parameters $z_j$ and $w_{i,k}$ we assign a Gaussian mixture prior with fixed number of clusters $G$:
+
+$$z_j,w_{i,k}\sim\sum_{g=1}^{G}\lambda_{g}MVN_d(\mu_{g},\sigma_{g}I_d)$$
+
+The prior probability for cluster assignment is Dirichlet with parameter $\nu$ for conjugacy:
+
+$$[\lambda_1,\dots,\lambda_G]\sim \tx{Dirichlet}(\nu)$$ and means are given normal hyperiors: $$\forall g:\,\,\mu_{g}\sim MVN_d(0,\sigma_\mu^2I_d)$$ All prior variances are given uninformative Inverse-Gamma hyperiors:\
+
+ $$\sigma_\theta^2,\sigma_\tau^2,\sigma_\mu^2,\forall g:\,\,\sigma_{g} \sim\tx{InvGamma}(\epsilon,\epsilon)$$ where $\epsilon$ is set to be sufficiently small as to be uninformative. If the sampler behaves poorly by estimating prior variances that are unsuitably large or small, these priors may be changed to be informative in order to force estimated parameters to fall within a reasonable range.\\
+ 
+
+\textbf{Sampling.} Sampling is Gibbs on each set of parameters. For parameters without conjugate Gibbs distributions, Metropolis-Hastings is used with normal proposals and variances adjusted adaptively throughout the sampling (see http://probability.ca/jeff/ftpdir/adaptex.pdf)\\
+
+
+The parameters $\mu_g,\sigma_x^2,$ and $K_{z_j},K_{w_i}$ have conjugate Gibbs distributions and can be sampled directly. This method is analogous to that used in Handcock, Raftery, and Tantrum (2007).
+    
+    $$\mu_{g}|\tx{others}\sim MVN\left(\frac{m_g\overline{z}_g}{m_g+\sigma_g^2/\omega^2},\frac{\sigma_g^2}{m_g+\sigma_g^2/\omega^2}\right)$$ $$\sigma_g^2|\tx{others}\sim \tx{InvGamma}\left(\epsilon+\frac{m_g}{2},\epsilon+\frac{m_g}{2}(\overline{z}_g-\mu_g)\right)$$ $$P(K_{z_j}=g|\tx{others})=\frac{\lambda_{g}\phi_d(z_j;\mu_{g},\sigma_{g}^2I_d)}{\sum_{g=1}^{G}\lambda_{g}\phi_d(z_j;\mu_{g},\sigma_{g}^2I_d)}$$ $$P(K_{w_{i,k}}=g|\tx{others})=\frac{\lambda_{g}\phi_d(w_{i,k};\mu_{g},\sigma_{g}^2I_d)}{\sum_{g=1}^{G}\lambda_{g}\phi_d(w_{i,k};\mu_{g},\sigma_{g}^2I_d)}$$ where $$m_g=\sum_{k:K_{z_j}=g}1+\sum_{i:K_{w_{i,k}}=g}1$$ $$s_g^2=\frac{1}{d}\left(\sum_{k:K_{z_j}=g}(z_j-\mu_g)^T(z_j-\mu_g)+\sum_{i:K_{w_{i,k}}=g}(w_{i,k}-\mu_g)^T(w_{i,k}-\mu_g)\right)$$ $$\overline{z}_g=\frac{1}{m_g}\left(\sum_{k:K_{z_j}=g}z_j+\sum_{k:K_{z_j}=g}z_j\right)$$ and $\phi_d$ is the d-dimensional multivariate normal density.\\ 
+  
+
+\textbf{Overall procedure.} We preform the steps in the following order:
+
+\begin{enumerate}
+	\item Propose and update $z$ and $w$.
+	\item Propose and update $\theta$, and $\tau$, sampling $\sigma_\theta^2$ and $\sigma_\tau^2$ after each respectively.
+	\item Sample $K,\mu_{g},\sigma_{g}^2,$ $\lambda_{g}$, and $\sigma_\mu^2$ from their posterior distributions.
+\end{enumerate}
+
+
+\end{document}
