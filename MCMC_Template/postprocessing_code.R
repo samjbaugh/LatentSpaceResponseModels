@@ -73,6 +73,13 @@ plot_latent_cluster(relabeled_parameters,8000,plot_pie=T,burn_in=0,mytitle='8000
 # # matched_parameters=procrustes_postprocess(stored_parameters,stored_likelihoods)
 # # init_out=initialize_sampler(2,ordinal=F)
 # 
+=======
+# # 
+# # load_charity_data()
+# # load(file='./Saved_output/saved_output_config_1_seed_555_data_spelling',verb=T)
+# # matched_parameters=procrustes_postprocess(stored_parameters,stored_likelihoods)
+# # init_out=initialize_sampler(2,ordinal=F)
+# 
 # plot_dirname=file.path(paste('Images/plots_config_',1,'_seed_',555,'_data_','spelling',sep=''))
 # plot_fun=plot_latent_cluster
 # for(jj in seq(100,2000,by=100))

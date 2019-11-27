@@ -140,6 +140,8 @@ plot_latent_ordinal_cluster <- function(stored_parameters,store_index,mytitle=""
   }
 }
 
+=======
+>>>>>>> fcff428ecbef471a114801bc5290046b1ae93a2d
 update_vector<-function(varname)
 {
   current_vector=current_values[[varname]]

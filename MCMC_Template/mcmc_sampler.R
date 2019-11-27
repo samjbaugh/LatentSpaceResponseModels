@@ -190,14 +190,10 @@ run_mcmc_sampler<-function(M,myseed,config_number,plot_iter=1000,
 M=1000
 myseed=222
 config_number=1
-<<<<<<< HEAD
-plot_iter=50
 load_data=load_drv_data
 ordinal=F
 # load_data=load_spelling_data
 # ordinal=FALSE
-run_mcmc_sampler(M,myseed,config_number,plot_iter=plot_iter,load_data=load_data,ordinal=ordinal,save_fig=F)
-=======
 plot_iter=100
 scaleterms=0
 sampler_output=run_mcmc_sampler(1000,myseed,config_number,plot_iter=plot_iter,
@@ -221,6 +217,7 @@ sampler_output=run_mcmc_sampler(1000,myseed,config_number,plot_iter=plot_iter,
 # ordinal=F
 # load_data=load_spelling_data
 # ordinal=FALSE
+<<<<<<< HEAD
 >>>>>>> fcff428ecbef471a114801bc5290046b1ae93a2d
 
 
@@ -263,3 +260,46 @@ sampler_output=run_mcmc_sampler(1000,myseed,config_number,plot_iter=plot_iter,
 # xtable(qclust)
 
 # print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))
+=======
+
+
+# # 
+# save_filename=file.path(paste('Saved_output/saved_output_config_',config_number,'_seed_',myseed,'_data_',dataname,sep=''))
+# load(save_filename,verb=T)
+# # rotated_parameters=procrustes_postprocess(stored_parameters,stored_likelihoods)
+# # post_processed_parameters=cluster_relabeling(rotated_parameters)
+# p=plot_latent_cluster(stored_parameters,10000,mytitle=toString(10000),save_fig=F,plot_pie=T)
+# 
+# 
+# fivenum<-function(x)
+# {
+#   return(list('min'=min(x),'Q1'=quantile(x,.25),'median'=median(x),'Q3'=quantile(x,.75),'max'=max(x),'mean'=mean(x),'sd'=sd(x)))
+# }
+# average_response=apply(X,1,mean)
+# 
+# q0=data.frame(t(do.call('rbind',lapply(1:ncluster,function(clusti) apply(X[current_values$K_z==clusti,],2,mean)))))
+# q1=data.frame(t(do.call('rbind',lapply(1:ncluster,function(clusti) fivenum(current_values$theta[current_values$K_z==clusti])))))
+# q2=data.frame(t(do.call('rbind',lapply(1:ncluster,function(clusti) fivenum(average_response[current_values$K_z==clusti])))))
+# names(q1)=c('cluster1','cluster2','cluster3')
+# names(q2)=c('cluster1','cluster2','cluster3')
+# xtable(q0)
+# xtable(q1)
+# xtable(q2)
+
+# save_image(p,'../Reports/Figures/simulated_cluster.png')
+
+# source('postprocessing_code.R')
+# rotated_parameters=procrustes_postprocess(stored_parameters,stored_likelihoods)
+# post_processed_parameters=cluster_relabeling(rotated_parameters)
+# p=plot_latent_cluster(post_processed_parameters,10000,mytitle=toString(10000),save_fig=F,plot_pie=T)
+# print(p)
+# save_image(p,'../Reports/Figures/abortion_cluster3.png')
+# 
+# 
+# qclust=data.frame(t(do.call('rbind',lapply(1:ncluster,function(clusti) apply(X[current_values$K_z==clusti,],2,mean)))))
+# names(qclust)=c('cluster1','cluster2','cluster3')
+# qclust=rbind(qclust,'average'=apply(qclust,2,mean))
+# xtable(qclust)
+
+# print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))
+>>>>>>> fcff428ecbef471a114801bc5290046b1ae93a2d
