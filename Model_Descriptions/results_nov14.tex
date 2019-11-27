@@ -1,0 +1,62 @@
+\documentclass[12pt]{article}
+
+\usepackage[margin=1.25in]{geometry}
+\usepackage{fancyhdr}
+\usepackage{setspace}
+\usepackage{ mathrsfs }
+
+\renewcommand{\baselinestretch}{1.1}\pagestyle{fancy}
+\pagestyle{fancy}
+\usepackage{amsfonts}
+\usepackage{bbold}
+\usepackage{listings}
+\usepackage{amsthm}
+\usepackage{amssymb,amsmath}
+\usepackage{xcolor}
+\usepackage{textpos}
+\usepackage{enumerate}
+\usepackage[utf8]{inputenc}
+\usepackage[english]{babel}
+\usepackage{mathtools}
+\usepackage{verbatim}
+\usepackage{graphicx}
+\graphicspath{ {images/} }
+\newcommand{\V}{\mathbb{V}}
+\newcommand{\E}{\mathbb{E}}
+\newcommand{\cov}{\textnormal{cov}}
+\newcommand{\tx}[1]{\textnormal{#1}}
+\usepackage{graphicx}
+\setlength{\parindent}{0pt}
+
+\begin{document}
+
+
+\begin{center}
+	\textbf{Abortion Results}
+\end{center}
+
+\includegraphics[scale=0.5]{imagefile}
+
+Percentages are \color{red}{red} means that the item was in the corresponding cluster
+
+\begin{table}[ht]
+	\centering
+	\begin{tabular}{rrrr}
+		\hline
+		& cluster1 & cluster2 & cluster3 \\ 
+		\hline
+		Q1 & \color{red}{\textbf{0.63}} & 0.51 & 0.16 \\ 
+		Q2 & \color{red}\textbf{0.72} & 0.68 & 0.20 \\ 
+		Q3 & \color{red}\textbf{0.67} & 0.58 & 0.20 \\ 
+		Q4 & \color{red}\textbf{0.73} & 0.65 & 0.23 \\ 
+		Q5 & 0.92 & \color{red}\textbf{0.94} & 0.83 \\ 
+		Q6 & 0.95 & 0.98 & \color{red}\textbf{0.91} \\ 
+		V7 & 0.93 & \color{red}\textbf{0.97} & 0.90 \\ 
+		average & 0.79 & 0.76 & 0.49 \\ 
+		\hline
+	\end{tabular}
+\end{table}
+
+\color{red}{hi}
+
+\end{document}

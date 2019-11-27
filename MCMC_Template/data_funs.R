@@ -9,6 +9,15 @@ load_spelling_data<-function()
   assign('nw',dim(X)[2],envir=.GlobalEnv)
 }
 
+load_drv_data<-function()
+{
+  raw_data=read.table('../Data/drv_data.txt')
+  assign("X",raw_data,envir=.GlobalEnv)
+  assign("dataname","drv",envir=.GlobalEnv)
+  assign('nz',dim(X)[1],envir=.GlobalEnv)
+  assign('nw',dim(X)[2],envir=.GlobalEnv)
+}
+
 load_charity_data<-function()
 {
   rawdata=read.table('../Data/charity.dat')

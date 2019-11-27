@@ -40,7 +40,7 @@ plot_latent <- function(stored_parameters,store_index,title="",save_fig=F,save_f
   }
 }
 
-plot_latent_cluster <- function(stored_parameters,store_index,mytitle="",save_fig=F,plot_pie=F,save_filename="")
+plot_latent_cluster <- function(stored_parameters,store_index,mytitle="",save_fig=F,plot_pie=F,save_filename="",burn_in=0)
 {
   z=data.frame(stored_parameters$z[[store_index]]) #data.frame(matrix(stored_parameters$z[M,],nz,2))
   names(z)<-c('coord1','coord2')
@@ -73,7 +73,7 @@ plot_latent_cluster <- function(stored_parameters,store_index,mytitle="",save_fi
   mu$K=sapply(1:ncluster,function(x) paste(toString(x)))
   mu$r=stored_parameters$sigma[[store_index]]
 
-  p0<-ggplot()+geom_point(aes(x=coord1,y=coord2,pch=K,col=gender),z,cex=2)
+  p0<-ggplot()+geom_point(aes(x=coord1,y=coord2,col=K),z,cex=2)
   p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')
   p0<-p0+ggtitle(paste('Latent space sample at k=',mytitle,sep=''))
   p0<-p0+geom_point(aes(x=coord1,y=coord2),pch=8,col='black',data=mu)

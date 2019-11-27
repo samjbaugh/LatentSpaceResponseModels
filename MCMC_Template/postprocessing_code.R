@@ -32,7 +32,7 @@ procrustes_postprocess<-function(stored_parameters,stored_likelihoods)
   return(matched_parameters)
 }
 
-cluster_relabeling<-function(stored_parameters,order_var='sigma')
+cluster_relabel<-function(stored_parameters,order_var='sigma')
 {
   ncluster=length(unique(stored_parameters$K_z[[1]]))
   relabeled_parameters=stored_parameters
@@ -40,26 +40,38 @@ cluster_relabeling<-function(stored_parameters,order_var='sigma')
   {
     order_stat=relabeled_parameters[[order_var]][[ii]]
     new_ordering=order(order_stat)
-    relabeled_parameters$sigma=relabeled_parameters$sigma[[ii]][new_ordering]
-    relabeled_parameters$mu=relabeled_parameters$mu[[ii]][new_ordering,]
+    relabeled_parameters$sigma[[ii]]=relabeled_parameters$sigma[[ii]][new_ordering]
+    relabeled_parameters$mu[[ii]]=relabeled_parameters$mu[[ii]][new_ordering,]
     relabeled_parameters$K_w[[ii]]=factor(relabeled_parameters$K_w[[ii]],levels=1:ncluster,labels=new_ordering)
     relabeled_parameters$K_z[[ii]]=factor(relabeled_parameters$K_z[[ii]],levels=1:ncluster,labels=new_ordering)
   }
   
   return(relabeled_parameters)
 }
+
+
+myseed=256
+config_number=1
+load_drv_data()
+save_filename=file.path(paste('Saved_output/saved_output_config_',config_number,'_seed_',myseed,'_data_',dataname,sep=''))
+load(save_filename,verb=T)
+matched_parameters=procrustes_postprocess(stored_parameters,stored_likelihoods)
+relabeled_parameters=cluster_relabel(matched_parameters)
+plot_latent_cluster(stored_parameters,8000,plot_pie=T,burn_in=0,mytitle='8000')
+plot_latent_cluster(relabeled_parameters,8000,plot_pie=T,burn_in=0,mytitle='8000 (matched and relabeled)')
+
 # 
 # load_charity_data()
 # load(file='./Saved_output/saved_output_config_1_seed_555_data_spelling',verb=T)
 # matched_parameters=procrustes_postprocess(stored_parameters,stored_likelihoods)
 # init_out=initialize_sampler(2,ordinal=F)
 
-plot_dirname=file.path(paste('Images/plots_config_',1,'_seed_',555,'_data_','spelling',sep=''))
-plot_fun=plot_latent_cluster
-for(jj in seq(100,2000,by=100))
-{
-  plot_fun(matched_parameters,jj,mytitle=toString(jj),save_fig=T,save_filename=paste(plot_dirname,'/iteration_',jj,'_matched.png',sep=''))
-}
-
-plot_fun(matched_parameters,1565,mytitle=toString(1565),save_fig=T,save_filename=paste(plot_dirname,'/iteration_',1565,'_matched.png',sep=''))
-plot_fun(stored_parameters,1565,mytitle=toString(1565),save_fig=T,save_filename=paste(plot_dirname,'/iteration_',1565,'.png',sep=''))
+# plot_dirname=file.path(paste('Images/plots_config_',1,'_seed_',555,'_data_','spelling',sep=''))
+# plot_fun=plot_latent_cluster
+# for(jj in seq(100,2000,by=100))
+# {
+#   plot_fun(matched_parameters,jj,mytitle=toString(jj),save_fig=T,save_filename=paste(plot_dirname,'/iteration_',jj,'_matched.png',sep=''))
+# }
+# 
+# plot_fun(matched_parameters,1565,mytitle=toString(1565),save_fig=T,save_filename=paste(plot_dirname,'/iteration_',1565,'_matched.png',sep=''))
+# plot_fun(stored_parameters,1565,mytitle=toString(1565),save_fig=T,save_filename=paste(plot_dirname,'/iteration_',1565,'.png',sep=''))
