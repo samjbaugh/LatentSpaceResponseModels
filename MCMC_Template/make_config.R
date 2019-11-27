@@ -1,15 +1,15 @@
 nu_config=10
-rate_all_config=0.001
-shape_all_config=0.001
-omega_init_config=5
+rate_all_config=3
+shape_all_config=2
+omega_init_config=4
 sigma_theta_config=.1
-sigma_mu_config=2
+sigma_mu_config=4
 sigma_beta_config=1
-cluster_sigma_config=1
-config_number=2
+cluster_sigma_config=2
+config_number=1
 sigma_tau_config=.1 #only needed for ordinal
 config_filename=paste('Run_configs/config_',config_number,'.Rdat',sep='')
-overwrite=F
+overwrite=T
 if(!file.exists(config_filename) | overwrite)
 {
   save(nu_config,rate_all_config,shape_all_config,

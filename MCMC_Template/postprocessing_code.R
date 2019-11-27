@@ -32,11 +32,11 @@ procrustes_postprocess<-function(stored_parameters,stored_likelihoods)
   return(matched_parameters)
 }
 
-cluster_relabel<-function(stored_parameters,order_var='sigma')
+cluster_relabeling<-function(parameterlist,order_var='sigma')
 {
-  ncluster=length(unique(stored_parameters$K_z[[1]]))
-  relabeled_parameters=stored_parameters
-  for(ii in 1:length(stored_parameters))
+  ncluster=length(unique(parameterlist$K_z[[1]]))
+  relabeled_parameters=parameterlist
+  for(ii in 1:length(parameterlist))
   {
     order_stat=relabeled_parameters[[order_var]][[ii]]
     new_ordering=order(order_stat)
@@ -66,6 +66,13 @@ plot_latent_cluster(relabeled_parameters,8000,plot_pie=T,burn_in=0,mytitle='8000
 # matched_parameters=procrustes_postprocess(stored_parameters,stored_likelihoods)
 # init_out=initialize_sampler(2,ordinal=F)
 
+=======
+# # 
+# # load_charity_data()
+# # load(file='./Saved_output/saved_output_config_1_seed_555_data_spelling',verb=T)
+# # matched_parameters=procrustes_postprocess(stored_parameters,stored_likelihoods)
+# # init_out=initialize_sampler(2,ordinal=F)
+# 
 # plot_dirname=file.path(paste('Images/plots_config_',1,'_seed_',555,'_data_','spelling',sep=''))
 # plot_fun=plot_latent_cluster
 # for(jj in seq(100,2000,by=100))

@@ -1,3 +1,5 @@
+require('scatterpie')
+
 sigmoid <- function(x)
 {
   return(1/(1+exp(-x)))
@@ -13,6 +15,8 @@ euc_dist_ordinal <- function(z,w)
   distout=pdist(z,w)
   return(array(as.matrix(distout),dim=c(nz,nw,ntau)))
 }
+
+source('plot_functions.R')
 
 global_update<-function(name,axis,newvalue)
 {
@@ -148,7 +152,7 @@ update_vector<-function(varname)
   prior_fun<-function(x) {prior_funs[[varname]](x)}
   
   logdiff_likelihood=likelihood_fun(proposed_vector)-likelihood_fun(current_vector)
-  logdiff_prior=prior_fun(proposed_vector)-prior_fun(current_vector)
+  logdiff_prior=0 #prior_fun(proposed_vector)-prior_fun(current_vector)
   
   alpha=exp(logdiff_likelihood+logdiff_prior)
   randnum=runif(n1) #one for each k or i
@@ -161,6 +165,13 @@ update_vector<-function(varname)
     error(e)
   }  
   return(list("newvalue"=retval,"alpha"=alpha,"accepts"=accepts)) 
+}
+
+update_is_spike<-function(varname="")
+{
+  likelihood_spike0=likelihood_logscale(current_values$logscale)
+  likelihood_spike1=likelihood_logscale(-Inf)
+  return(sample(c(0,1),1,p=c(likelihood_spike0,likelihood_spike1)))
 }
 
 update_K <- function(varname="")
