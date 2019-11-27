@@ -14,7 +14,7 @@ initialize_sampler<-function(config_number,ordinal=F)
   #configurable initialization parameters
   omega_init=omega_init_config
   
-  sigma_theta_init=sigma_theta_config #sqrt(rinvgamma(1,shape=invgam_shape_additive,rate=invgam_rate_additive))
+  sigma_theta_init=1 #sigma_theta_config #sqrt(rinvgamma(1,shape=invgam_shape_additive,rate=invgam_rate_additive))
   theta_init=matrix(rnorm(nz,0,sigma_theta_init),nz,1)
   
   #initialize z:
@@ -65,16 +65,17 @@ initialize_sampler<-function(config_number,ordinal=F)
   }
   
   all_latent_init=rbind(z_init,w_init)
-  logscale_init=matrix(log(sqrt(mean(all_latent_init^2))),1,1)
-  z_init=z_init/c(sqrt(mean(z_init^2)))
-  w_init=w_init/c(sqrt(mean(w_init^2)))
-  mu_init=mu_init/c(exp(logscale_init))
-  sigma_init=sigma_init/c(exp(logscale_init))
+  logscale_init=matrix(-10,1,1)
+  z_init=z_init/c(sqrt(mean(all_latent_init^2)))
+  w_init=w_init/c(sqrt(mean(all_latent_init^2)))
+  mu_init=mu_init/c(sqrt(mean(all_latent_init^2)))
+  sigma_init=sigma_init/c(sqrt(mean(all_latent_init^2)))
   
   stored_vars_init=list()
   stored_vars_init$gm=gms
   stored_vars_init$gmeans=gmeans
   stored_vars_init$gsd=gsd
+  stored_vars_init$is_spike=1
   
   #init beta
   if(ordinal)
@@ -100,7 +101,8 @@ initialize_sampler<-function(config_number,ordinal=F)
                    "K_w"=K_w_init,
                    "omega"=omega_init,
                    "logscale"=logscale_init,
-                   "sigma_logscale"=.1)
+                   "sigma_logscale"=10,
+                   "is_spike"=0)
   
   if(ordinal)
   {
@@ -115,12 +117,21 @@ initialize_sampler<-function(config_number,ordinal=F)
     init_values$sigma_tau=sigma_tau_init
     
     assign("varname_list",c("z","w","theta","logscale","tau"),envir=.GlobalEnv)
-    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=FALSE,"logscale"=FALSE,"tau"=TRUE),envir=.GlobalEnv)
+    assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=FALSE,"logscale"=FALSE,"tau"=FALSE),envir=.GlobalEnv)
     assign("latent_tf",list("z"=TRUE,"w"=TRUE,"theta"=FALSE,"logscale"=FALSE,"tau"=FALSE),envir=.GlobalEnv)
   }else{
     assign("varname_list",c("z","w","theta","logscale","beta"),envir=.GlobalEnv)
     assign("update_sigma_tf",list("z"=FALSE,"w"=FALSE,"theta"=FALSE,"logscale"=FALSE,"beta"=FALSE),envir=.GlobalEnv)
     assign("latent_tf",list("z"=TRUE,"w"=TRUE,"theta"=FALSE,"logscale"=FALSE,"beta"=FALSE),envir=.GlobalEnv)
+  }
+  
+  if(ncluster==1)
+  {
+    init_values$sigma_z=sigma_init
+    init_values$sigma_w=sigma_init
+    assign("update_sigma_tf",list("z"=T,"w"=T,"theta"=FALSE,"logscale"=FALSE,"beta"=FALSE),envir=.GlobalEnv)
+  }else{
+    init_values$sigma=sigma_init
   }
   
   proposal_sigs=list()

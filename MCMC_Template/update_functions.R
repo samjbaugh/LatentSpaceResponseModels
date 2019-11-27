@@ -1,3 +1,5 @@
+require('scatterpie')
+
 sigmoid <- function(x)
 {
   return(1/(1+exp(-x)))
@@ -14,126 +16,13 @@ euc_dist_ordinal <- function(z,w)
   return(array(as.matrix(distout),dim=c(nz,nw,ntau)))
 }
 
+source('plot_functions.R')
+
 global_update<-function(name,axis,newvalue)
 {
   myvariable=get(name)
   myvariable[[axis]]=newvalue
   assign(name,myvariable,envir=.GlobalEnv)
-}
-
-plot_latent <- function(stored_parameters,store_index,title="",save_fig=F,save_filename="")
-{
-  z=data.frame(stored_parameters$z[[store_index]])
-  w=data.frame(stored_parameters$w[[store_index]])
-  p0<-ggplot()
-  p0<-p0+geom_point(aes(x=coord1,y=coord2,col="w"),data=z,cex=3)
-  p0<-p0+geom_point(aes(x=coord1,y=coord2,col="z"),data=w,cex=3)
-  p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')+ggtitle(paste('Latent space sample at iteration',store_index))
-  if(save_fig)
-  {
-    png(save_filename)
-    print(p0)
-    dev.off()
-  }else
-  {
-    print(p0)
-  }
-}
-
-plot_latent_cluster <- function(stored_parameters,store_index,mytitle="",save_fig=F,plot_pie=F,save_filename="")
-{
-  z=data.frame(stored_parameters$z[[store_index]]) #data.frame(matrix(stored_parameters$z[M,],nz,2))
-  names(z)<-c('coord1','coord2')
-  nz=dim(z)[1]
-  
-  w=data.frame(stored_parameters$w[[store_index]]) #data.frame(matrix(stored_parameters$w[M,],nw,2))
-  names(w)<-c('coord1','coord2')
-  nw=dim(w)[1]
-  ncluster=2 #max(c(stored_parameters$K_z[[store_index]],stored_parameters$K_w[[store_index]]))
-  
-  temp_z=sapply(stored_parameters$K_z[[store_index]],function(x) paste(toString(x)))
-  z$K=as.factor(temp_z)
-
-  temp_w=sapply(stored_parameters$K_w[[store_index]],function(x) paste(toString(x)))
-  w$K=as.factor(temp_w)
-  w$name=sapply(1:nw,toString)
-  
-  if(plot_pie)
-  {
-    total=length(stored_parameters$K_w)
-    clust_dist <- function(wnum) {return(c("1"=mean(sapply(stored_parameters$K_w[burn_in:total],function(x) x[wnum]==1)),"2"=mean(sapply(stored_parameters$K_w[burn_in:total],function(x) x[wnum]==2)),"3"=mean(sapply(stored_parameters$K_w[burn_in:total],function(x) x[wnum]==3))))}
-    clust_totals <- sapply(1:nw,clust_dist)
-    w$cluster1=clust_totals[1,]
-    w$cluster2=clust_totals[2,]
-    w$cluster3=clust_totals[3,]
-  }
-
-  mu=data.frame(stored_parameters$mu[[store_index]])
-  colnames(mu)<-c('coord1','coord2')
-  mu$K=sapply(1:ncluster,function(x) paste(toString(x)))
-  mu$r=stored_parameters$sigma[[store_index]]
-
-  p0<-ggplot()+geom_point(aes(x=coord1,y=coord2,pch=K,col=gender),z,cex=2)
-  p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')
-  p0<-p0+ggtitle(paste('Latent space sample at k=',mytitle,sep=''))
-  p0<-p0+geom_point(aes(x=coord1,y=coord2),pch=8,col='black',data=mu)
-  p0<-p0+geom_circle(aes(x0=coord1,y0=coord2,r=r),data=mu)
-  p0<-p0+geom_text(aes(x=coord1,y=coord2,label=name),hjust=2,vjust=2,data=w,fontface="bold")
-  
-  if(plot_pie)
-  {p0<-p0+geom_scatterpie(aes(x=coord1,y=coord2),data=w,cols=c("cluster1","cluster2","cluster3"))}
-  
-  if(save_fig)
-  {
-    png(save_filename)
-    print(p0)
-    dev.off()
-  }else
-  {
-    print(p0)
-  }
-}
-
-plot_latent_ordinal_cluster <- function(stored_parameters,store_index,mytitle="",save_fig=F,plot_pie=F,save_filename="")
-{
-  z=data.frame(stored_parameters$z[[store_index]]) #data.frame(matrix(stored_parameters$z[M,],nz,2))
-  w=data.frame(stored_parameters$w[[store_index]]) #data.frame(matrix(stored_parameters$w[M,],nw,2))
-  # nw=dim(w)[1]
-  # nz=dim(z)[1]
-  names(z)<-c('coord1','coord2')
-  names(w)<-c('coord1','coord2')
-  
-  temp_z=sapply(stored_parameters$K_z[[store_index]],function(x) paste(toString(x)))
-  z$K=as.factor(temp_z)
-  
-  temp_w=sapply(stored_parameters$K_w[[store_index]],function(x) paste(toString(x)))
-  w$K=as.factor(temp_w)
-  w$wname=c(sapply(1:ntau,function(ii) rep(paste("w_k=",ii,sep=''),nw)))
-  
-  mu=data.frame(stored_parameters$mu[[store_index]])
-  colnames(mu)<-c('coord1','coord2')
-  mu$wz="mu"
-  mu$K=sapply(1:ncluster,function(x) paste(toString(x)))
-  mu$r=stored_parameters$sigma[[store_index]]
-  
-  p0<-ggplot()
-  p0<-p0+geom_point(aes(x=coord1,y=coord2,col=K,pch='z'),data=z,cex=2)
-  p0<-p0+geom_point(aes(x=coord1,y=coord2,col=K,pch=wname),data=w,cex=2)
-  p0<-p0+geom_point(aes(x=coord1,y=coord2,col=K,pch='mu'),data=mu)
-  p0<-p0+xlab('coordinate 1')+ylab('coordinate 2')+ggtitle(paste('Latent space sample at M=',mytitle,sep=''))
-  p0<-p0+geom_circle(aes(x0=coord1,y0=coord2,col=K,r=r),data=mu)
-  p0<-p0+scale_shape_manual(values=c("z"=16,"w_k=1"=8,"w_k=2"=9,"w_k=3"=10,"w_k=4"=11,
-                                     "w_k=5" = 12, "mu"=4))
-  # p1=p0+geom_point(aes(x=current_values[['mu_z']][,1],y=current_values[['mu_z']][,2],col=c("1_z","2_z","3_z","4_z","5_z"),pch="cluster mu z"),cex=4)
-  if(save_fig)
-  {
-    png(save_filename)
-    print(p0)
-    dev.off()
-  }else
-  {
-    print(p0)
-  }
 }
 
 update_vector<-function(varname)
@@ -148,7 +37,7 @@ update_vector<-function(varname)
   prior_fun<-function(x) {prior_funs[[varname]](x)}
   
   logdiff_likelihood=likelihood_fun(proposed_vector)-likelihood_fun(current_vector)
-  logdiff_prior=prior_fun(proposed_vector)-prior_fun(current_vector)
+  logdiff_prior=0 #prior_fun(proposed_vector)-prior_fun(current_vector)
   
   alpha=exp(logdiff_likelihood+logdiff_prior)
   randnum=runif(n1) #one for each k or i
@@ -161,6 +50,13 @@ update_vector<-function(varname)
     error(e)
   }  
   return(list("newvalue"=retval,"alpha"=alpha,"accepts"=accepts)) 
+}
+
+update_is_spike<-function(varname="")
+{
+  likelihood_spike0=likelihood_logscale(current_values$logscale)
+  likelihood_spike1=likelihood_logscale(-Inf)
+  return(sample(c(0,1),1,p=c(likelihood_spike0,likelihood_spike1)))
 }
 
 update_K <- function(varname="")
