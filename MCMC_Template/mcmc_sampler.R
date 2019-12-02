@@ -217,8 +217,6 @@ sampler_output=run_mcmc_sampler(1000,myseed,config_number,plot_iter=plot_iter,
 # ordinal=F
 # load_data=load_spelling_data
 # ordinal=FALSE
-<<<<<<< HEAD
->>>>>>> fcff428ecbef471a114801bc5290046b1ae93a2d
 
 
 # # 
@@ -260,7 +258,6 @@ sampler_output=run_mcmc_sampler(1000,myseed,config_number,plot_iter=plot_iter,
 # xtable(qclust)
 
 # print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))
-=======
 
 
 # # 
@@ -302,4 +299,3 @@ sampler_output=run_mcmc_sampler(1000,myseed,config_number,plot_iter=plot_iter,
 # xtable(qclust)
 
 # print(sapply(acceptance_rates,function(x) mean(x,na.rm=T)))
->>>>>>> fcff428ecbef471a114801bc5290046b1ae93a2d
